@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batalha - Simulador de Batalhas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Iniciar Batalha</h1>
+            <p>Escolha dois personagens para se enfrentarem na arena</p>
+        </header>
+        
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Início</a></li>
+                <li><a href="{{ url_for('create_character') }}">Criar Personagem</a></li>
+                <li><a href="{{ url_for('battle') }}" class="active">Batalhar</a></li>
+                <li><a href="{{ url_for('battle_history') }}">Histórico</a></li>
+            </ul>
+        </nav>
+        
+        <main>
+            <section class="battle-setup">
+                {% if personagens|length < 2 %}
+                    <div class="insufficient-characters">
+                        <h2>Personagens Insuficientes</h2>
+                        <p>Você precisa de pelo menos 2 personagens para iniciar uma batalha.</p>
+                        <a href="{{ url_for('create_character') }}" class="btn btn-primary">Criar Personagem</a>
+                    </div>
+                {% else %}
+                    <form method="post" action="{{ url_for('battle') }}" class="battle-form">
+                        <h2>Selecione os Combatentes</h2>
+                        
+                        <div class="combatants-selection">
+                            <div class="combatant-selector">
+                                <h3>Combatente 1</h3>
+                                <select name="personagem1" id="personagem1" required>
+                                    <option value="">Selecione um personagem</option>
+                                    {% for personagem in personagens %}
+                                        <option value="{{ personagem.id }}" data-classe="{{ personagem.classe.lower() }}">
+                                            {{ personagem.nome }} ({{ personagem.classe }}, Nv.{{ personagem.nivel }})
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="character-preview" id="preview1">
+                                    <div class="card-placeholder">Selecione um personagem</div>
+                                </div>
+                            </div>
+                            
+                            <div class="versus">
+                                <span>VS</span>
+                            </div>
+                            
+                            <div class="combatant-selector">
+                                <h3>Combatente 2</h3>
+                                <select name="personagem2" id="personagem2" required>
+                                    <option value="">Selecione um personagem</option>
+                                    {% for personagem in personagens %}
+                                        <option value="{{ personagem.id }}" data-classe="{{ personagem.classe.lower() }}">
+                                            {{ personagem.nome }} ({{ personagem.classe }}, Nv.{{ personagem.nivel }})
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="character-preview" id="preview2">
+                                    <div class="card-placeholder">Selecione um personagem</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="battle-arena-preview">
+                            <h3>Arena de Batalha</h3>
+                            <div class="arena-select">
+                                <select name="arena" id="arena">
+                                    <option value="floresta">Floresta Élfica</option>
+                                    <option value="castelo">Castelo de Pedra</option>
+                                    <option value="vulcao">Vulcão Ardente</option>
+                                    <option value="planicie">Planície Aberta</option>
+                                </select>
+                            </div>
+                            <div class="arena-image" id="arena-preview">
+                                <!-- Arena preview will be shown here -->
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-danger">Iniciar Batalha</button>
+                            <a href="{{ url_for('index') }}" class="btn">Cancelar</a>
+                        </div>
+                    </form>
+                {% endif %}
+            </section>
+        </main>
+        
+        <footer>
+            <p>&copy; 2025 Simulador de Batalhas Medievais | Projeto Acadêmico - UnB Gama</p>
+        </footer>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const personagem1Select = document.getElementById('personagem1');
+            const personagem2Select = document.getElementById('personagem2');
+            const preview1 = document.getElementById('preview1');
+            const preview2 = document.getElementById('preview2');
+            const arenaSelect = document.getElementById('arena');
+            const arenaPreview = document.getElementById('arena-preview');
+            
+            // Update character preview when selection changes
+            personagem1Select.addEventListener('change', function() {
+                updateCharacterPreview(this, preview1);
+                validateSelections();
+            });
+            
+            personagem2Select.addEventListener('change', function() {
+                updateCharacterPreview(this, preview2);
+                validateSelections();
+            });
+            
+            // Update arena preview when selection changes
+            arenaSelect.addEventListener('change', function() {
+                updateArenaPreview();
+            });
+            
+            // Initialize previews
+            updateArenaPreview();
+            
+            function updateCharacterPreview(select, previewElement) {
+                if (select.value) {
+                    const selectedOption = select.options[select.selectedIndex];
+                    const characterClass = selectedOption.getAttribute('data-classe');
+                    const characterName = selectedOption.text.split(' (')[0];
+                    
+                    previewElement.innerHTML = `
+                        <div class="character-card ${characterClass}">
+                            <div class="character-header">
+                                <h3>${characterName}</h3>
+                                <span class="character-class">${characterClass}</span>
+                            </div>
+                            <div class="character-avatar ${characterClass}-avatar"></div>
+                        </div>
+                    `;
+                } else {
+                    previewElement.innerHTML = `<div class="card-placeholder">Selecione um personagem</div>`;
+                }
+            }
+            
+            function updateArenaPreview() {
+                const arenaValue = arenaSelect.value;
+                arenaPreview.className = 'arena-image';
+                arenaPreview.classList.add(`arena-${arenaValue}`);
+            }
+            
+            function validateSelections() {
+                // Prevent selecting the same character for both combatants
+                if (personagem1Select.value && personagem1Select.value === personagem2Select.value) {
+                    alert('Você não pode selecionar o mesmo personagem para ambos os combatentes!');
+                    personagem2Select.value = '';
+                    updateCharacterPreview(personagem2Select, preview2);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

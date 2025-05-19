@@ -1,0 +1,67 @@
+{
+  "id": "13ebedff-42ac-4569-b7f9-e4ce082fbc36",
+  "nome": "Angelol Apelao",
+  "classe": "Arqueiro",
+  "nivel": 1,
+  "experiencia": 0,
+  "vida_maxima": 95,
+  "vida_atual": 95,
+  "forca": 10,
+  "destreza": 15,
+  "inteligencia": 10,
+  "constituicao": 9,
+  "habilidades": [
+    {
+      "id": "tiro_certeiro",
+      "nome": "Tiro Certeiro",
+      "descricao": "Um tiro preciso que causa dano extra",
+      "custo": 25,
+      "tipo": "ataque",
+      "multiplicador": 1.8,
+      "bonus_critico": 15
+    },
+    {
+      "id": "chuva_de_flechas",
+      "nome": "Chuva de Flechas",
+      "descricao": "Dispara múltiplas flechas que causam dano em área",
+      "custo": 40,
+      "tipo": "ataque",
+      "multiplicador": 1.2,
+      "num_flechas": 3,
+      "custo_municao": 3
+    },
+    {
+      "id": "flecha_perfurante",
+      "nome": "Flecha Perfurante",
+      "descricao": "Uma flecha que ignora parte da defesa do alvo",
+      "custo": 30,
+      "tipo": "ataque",
+      "multiplicador": 1.5,
+      "penetracao_armadura": 0.3,
+      "custo_municao": 1
+    },
+    {
+      "id": "evasao",
+      "nome": "Evasão",
+      "descricao": "Aumenta a chance de esquivar de ataques",
+      "custo": 20,
+      "tipo": "defesa",
+      "bonus_evasao": 0.3,
+      "duracao": 2
+    }
+  ],
+  "inventario": [],
+  "equipamentos": {
+    "arma": null,
+    "armadura": null,
+    "acessorio": null
+  },
+  "estado_defesa": false,
+  "stamina": 100,
+  "stamina_maxima": 100,
+  "municao": 20,
+  "flechas_especiais": [],
+  "critical_hit_chance": 10.0,
+  "critical_damage_multiplier": 1.5,
+  "last_attack_was_critical": false
+}

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ personagem.nome }} - Detalhes do Personagem</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Detalhes do Personagem</h1>
+            <p>Visualizando informações de {{ personagem.nome }}</p>
+        </header>
+        
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Início</a></li>
+                <li><a href="{{ url_for('create_character') }}">Criar Personagem</a></li>
+                <li><a href="{{ url_for('battle') }}">Batalhar</a></li>
+                <li><a href="{{ url_for('battle_history') }}">Histórico</a></li>
+            </ul>
+        </nav>
+        
+        <main>
+            <section class="character-details">
+                <div class="character-sheet {{ personagem.classe.lower() }}">
+                    <div class="character-header">
+                        <div class="character-avatar {{ personagem.classe.lower() }}-avatar"></div>
+                        <div class="character-identity">
+                            <h2>{{ personagem.nome }}</h2>
+                            <div class="character-class-badge">{{ personagem.classe }}</div>
+                            <div class="character-level">Nível {{ personagem.nivel }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="character-stats-container">
+                        <div class="stats-column">
+                            <h3>Atributos Básicos</h3>
+                            <div class="stat-grid">
+                                <div class="stat-item">
+                                    <div class="stat-icon strength"></div>
+                                    <div class="stat-info">
+                                        <span class="stat-name">Força</span>
+                                        <span class="stat-value">{{ personagem.forca }}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="stat-item">
+                                    <div class="stat-icon dexterity"></div>
+                                    <div class="stat-info">
+                                        <span class="stat-name">Destreza</span>
+                                        <span class="stat-value">{{ personagem.destreza }}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="stat-item">
+                                    <div class="stat-icon intelligence"></div>
+                                    <div class="stat-info">
+                                        <span class="stat-name">Inteligência</span>
+                                        <span class="stat-value">{{ personagem.inteligencia }}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="stat-item">
+                                    <div class="stat-icon constitution"></div>
+                                    <div class="stat-info">
+                                        <span class="stat-name">Constituição</span>
+                                        <span class="stat-value">{{ personagem.constituicao }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="health-experience">
+                                <div class="health-container">
+                                    <h4>Vida</h4>
+                                    <div class="health-bar">
+                                        <div class="health-fill" style="width: {{ (personagem.vida_atual / personagem.vida_maxima) * 100 }}%"></div>
+                                    </div>
+                                    <span class="health-text">{{ personagem.vida_atual }} / {{ personagem.vida_maxima }}</span>
+                                </div>
+                                
+                                <div class="experience-container">
+                                    <h4>Experiência</h4>
+                                    <div class="experience-bar">
+                                        <div class="experience-fill" style="width: {{ (personagem.experiencia / (personagem.nivel * 100)) * 100 }}%"></div>
+                                    </div>
+                                    <span class="experience-text">{{ personagem.experiencia }} / {{ personagem.nivel * 100 }}</span>
+                                </div>
+                                
+                                {% if personagem.classe == "Guerreiro" %}
+                                    <div class="resource-container">
+                                        <h4>Fúria</h4>
+                                        <div class="resource-bar fury">
+                                            <div class="resource-fill" style="width: {{ (personagem.furia / personagem.furia_maxima) * 100 }}%"></div>
+                                        </div>
+                                        <span class="resource-text">{{ personagem.furia }} / {{ personagem.furia_maxima }}</span>
+                                    </div>
+                                {% elif personagem.classe == "Mago" %}
+                                    <div class="resource-container">
+                                        <h4>Mana</h4>
+                                        <div class="resource-bar mana">
+                                            <div class="resource-fill" style="width: {{ (personagem.mana / personagem.mana_maxima) * 100 }}%"></div>
+                                        </div>
+                                        <span class="resource-text">{{ personagem.mana }} / {{ personagem.mana_maxima }}</span>
+                                        <div class="element-indicator">
+                                            <span>Elemento Ativo: </span>
+                                            <span class="element {{ personagem.elemento_ativo }}">{{ personagem.elemento_ativo }}</span>
+                                        </div>
+                                    </div>
+                                {% elif personagem.classe == "Arqueiro" %}
+                                    <div class="resource-container">
+                                        <h4>Stamina</h4>
+                                        <div class="resource-bar stamina">
+                                            <div class="resource-fill" style="width: {{ (personagem.stamina / personagem.stamina_maxima) * 100 }}%"></div>
+                                        </div>
+                                        <span class="resource-text">{{ personagem.stamina }} / {{ personagem.stamina_maxima }}</span>
+                                        <div class="ammo-indicator">
+                                            <span>Flechas: {{ personagem.municao }}</span>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="stats-column">
+                            <h3>Equipamentos</h3>
+                            <div class="equipment-slots">
+                                <div class="equipment-slot">
+                                    <div class="slot-name">Arma</div>
+                                    <div class="slot-item {% if personagem.equipamentos.arma %}equipped{% endif %}">
+                                        {% if personagem.equipamentos.arma %}
+                                            <div class="item-name">{{ personagem.equipamentos.arma.nome }}</div>
+                                            <div class="item-stats">
+                                                {% if personagem.equipamentos.arma.dano %}
+                                                    <span>Dano: {{ personagem.equipamentos.arma.dano }}</span>
+                                                {% endif %}
+                                            </div>
+                                        {% else %}
+                                            <div class="empty-slot">Nenhuma arma equipada</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="equipment-slot">
+                                    <div class="slot-name">Armadura</div>
+                                    <div class="slot-item {% if personagem.equipamentos.armadura %}equipped{% endif %}">
+                                        {% if personagem.equipamentos.armadura %}
+                                            <div class="item-name">{{ personagem.equipamentos.armadura.nome }}</div>
+                                            <div class="item-stats">
+                                                {% if personagem.equipamentos.armadura.defesa %}
+                                                    <span>Defesa: {{ personagem.equipamentos.armadura.defesa }}</span>
+                                                {% endif %}
+                                            </div>
+                                        {% else %}
+                                            <div class="empty-slot">Nenhuma armadura equipada</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="equipment-slot">
+                                    <div class="slot-name">Acessório</div>
+                                    <div class="slot-item {% if personagem.equipamentos.acessorio %}equipped{% endif %}">
+                                        {% if personagem.equipamentos.acessorio %}
+                                            <div class="item-name">{{ personagem.equipamentos.acessorio.nome }}</div>
+                                            <div class="item-stats">
+                                                <!-- Show acessory stats here -->
+                                            </div>
+                                        {% else %}
+                                            <div class="empty-slot">Nenhum acessório equipado</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h3>Habilidades</h3>
+                            <div class="abilities-list">
+                                {% for habilidade in personagem.habilidades %}
+                                    <div class="ability-item {% if habilidade.tipo == 'ataque' %}attack{% elif habilidade.tipo == 'defesa' %}defense{% else %}utility{% endif %}">
+                                        <div class="ability-header">
+                                            <h4>{{ habilidade.nome }}</h4>
+                                            <span class="ability-type">{{ habilidade.tipo }}</span>
+                                        </div>
+                                        <p class="ability-description">{{ habilidade.descricao }}</p>
+                                        <div class="ability-details">
+                                            <span class="ability-cost">
+                                                Custo: 
+                                                {% if personagem.classe == "Guerreiro" %}
+                                                    {{ habilidade.custo }} Fúria
+                                                {% elif personagem.classe == "Mago" %}
+                                                    {{ habilidade.custo }} Mana
+                                                {% elif personagem.classe == "Arqueiro" %}
+                                                    {{ habilidade.custo }} Stamina
+                                                {% endif %}
+                                            </span>
+                                            
+                                            {% if habilidade.multiplicador %}
+                                                <span class="ability-multiplier">Dano: {{ habilidade.multiplicador }}x</span>
+                                            {% endif %}
+                                            
+                                            {% if habilidade.elemento %}
+                                                <span class="ability-element {{ habilidade.elemento }}">{{ habilidade.elemento }}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="character-actions">
+                    <a href="{{ url_for('inventory', character_id=personagem.id) }}" class="btn btn-primary">Gerenciar Inventário</a>
+                    <a href="{{ url_for('index') }}" class="btn">Voltar</a>
+                </div>
+            </section>
+        </main>
+        
+        <footer>
+            <p>&copy; 2025 Simulador de Batalhas Medievais | Projeto Acadêmico - UnB Gama</p>
+        </footer>
+    </div>
+</body>
+</html>

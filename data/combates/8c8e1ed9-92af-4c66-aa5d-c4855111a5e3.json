@@ -1,0 +1,167 @@
+{
+  "id": "8c8e1ed9-92af-4c66-aa5d-c4855111a5e3",
+  "personagem1": {
+    "id": "13ebedff-42ac-4569-b7f9-e4ce082fbc36",
+    "nome": "Angelol Apelao",
+    "classe": "Arqueiro",
+    "nivel": 1,
+    "experiencia": 0,
+    "vida_maxima": 95,
+    "vida_atual": 53,
+    "forca": 10,
+    "destreza": 15,
+    "inteligencia": 10,
+    "constituicao": 9,
+    "habilidades": [
+      {
+        "id": "tiro_certeiro",
+        "nome": "Tiro Certeiro",
+        "descricao": "Um tiro preciso que causa dano extra",
+        "custo": 25,
+        "tipo": "ataque",
+        "multiplicador": 1.8,
+        "bonus_critico": 15
+      },
+      {
+        "id": "chuva_de_flechas",
+        "nome": "Chuva de Flechas",
+        "descricao": "Dispara múltiplas flechas que causam dano em área",
+        "custo": 40,
+        "tipo": "ataque",
+        "multiplicador": 1.2,
+        "num_flechas": 3,
+        "custo_municao": 3
+      },
+      {
+        "id": "flecha_perfurante",
+        "nome": "Flecha Perfurante",
+        "descricao": "Uma flecha que ignora parte da defesa do alvo",
+        "custo": 30,
+        "tipo": "ataque",
+        "multiplicador": 1.5,
+        "penetracao_armadura": 0.3,
+        "custo_municao": 1
+      },
+      {
+        "id": "evasao",
+        "nome": "Evasão",
+        "descricao": "Aumenta a chance de esquivar de ataques",
+        "custo": 20,
+        "tipo": "defesa",
+        "bonus_evasao": 0.3,
+        "duracao": 2
+      }
+    ],
+    "inventario": [],
+    "equipamentos": {
+      "arma": null,
+      "armadura": null,
+      "acessorio": null
+    },
+    "estado_defesa": false,
+    "stamina": 100,
+    "stamina_maxima": 100,
+    "municao": 20,
+    "flechas_especiais": [],
+    "critical_hit_chance": 10.0,
+    "critical_damage_multiplier": 1.5,
+    "last_attack_was_critical": false
+  },
+  "personagem2": {
+    "id": "793f5706-2621-4011-8566-1ea553077833",
+    "nome": "Paulao",
+    "classe": "Mago",
+    "nivel": 1,
+    "experiencia": 0,
+    "vida_maxima": 90,
+    "vida_atual": 90,
+    "forca": 8,
+    "destreza": 10,
+    "inteligencia": 15,
+    "constituicao": 10,
+    "habilidades": [
+      {
+        "id": "bola_de_fogo",
+        "nome": "Bola de Fogo",
+        "descricao": "Conjura uma bola de fogo que causa dano ao alvo",
+        "custo": 25,
+        "tipo": "ataque",
+        "elemento": "fogo",
+        "multiplicador": 2.0
+      },
+      {
+        "id": "raio_de_gelo",
+        "nome": "Raio de Gelo",
+        "descricao": "Conjura um raio de gelo que causa dano e reduz a velocidade do alvo",
+        "custo": 30,
+        "tipo": "ataque",
+        "elemento": "gelo",
+        "multiplicador": 1.6,
+        "efeito": "lentidao"
+      },
+      {
+        "id": "barreira_arcana",
+        "nome": "Barreira Arcana",
+        "descricao": "Cria uma barreira mágica que absorve dano",
+        "custo": 35,
+        "tipo": "defesa",
+        "duracao": 2,
+        "absorve_dano": 40
+      },
+      {
+        "id": "mudar_elemento",
+        "nome": "Mudar Elemento",
+        "descricao": "Muda o elemento ativo do mago",
+        "custo": 10,
+        "tipo": "utilidade",
+        "elementos_disponiveis": [
+          "fogo",
+          "gelo",
+          "raio",
+          "arcano"
+        ]
+      }
+    ],
+    "inventario": [],
+    "equipamentos": {
+      "arma": null,
+      "armadura": null,
+      "acessorio": null
+    },
+    "estado_defesa": false,
+    "mana": 75,
+    "mana_maxima": 100,
+    "elemento_ativo": "fogo",
+    "elemental_damage_multiplier": 1.2
+  },
+  "turno_atual": 2,
+  "personagem_ativo": "13ebedff-42ac-4569-b7f9-e4ce082fbc36",
+  "finalizado": false,
+  "vencedor": null,
+  "log_combate": [
+    {
+      "turno": 1,
+      "acao": "ataque",
+      "atacante": "Angelol Apelao",
+      "defensor": "Paulao",
+      "dano": 19,
+      "vida_restante_defensor": 71
+    },
+    {
+      "turno": 1,
+      "acao": "habilidade",
+      "usuario": "Paulao",
+      "habilidade": "Bola de Fogo",
+      "resultado": {
+        "sucesso": true,
+        "tipo": "habilidade",
+        "habilidade": "Bola de Fogo",
+        "usuario": "Paulao",
+        "alvo": "Angelol Apelao",
+        "dano": 42,
+        "vida_restante_alvo": 53,
+        "efeitos": []
+      }
+    }
+  ]
+}

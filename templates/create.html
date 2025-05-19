@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Personagem - Simulador de Batalhas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Criar Novo Personagem</h1>
+            <p>Escolha sua classe e defina seu campeão para as batalhas em Eldoria</p>
+        </header>
+        
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Início</a></li>
+                <li><a href="{{ url_for('create_character') }}" class="active">Criar Personagem</a></li>
+                <li><a href="{{ url_for('battle') }}">Batalhar</a></li>
+                <li><a href="{{ url_for('battle_history') }}">Histórico</a></li>
+            </ul>
+        </nav>
+        
+        <main>
+            <section class="creation-section">
+                <form method="post" action="{{ url_for('create_character') }}" class="creation-form">
+                    <div class="form-section">
+                        <h2>Informações Básicas</h2>
+                        <div class="form-group">
+                            <label for="nome">Nome do Personagem:</label>
+                            <input type="text" id="nome" name="nome" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h2>Escolha sua Classe</h2>
+                        <div class="class-selection">
+                            <div class="class-option">
+                                <input type="radio" id="guerreiro" name="classe" value="guerreiro" checked>
+                                <label for="guerreiro" class="class-card guerreiro">
+                                    <div class="class-icon"></div>
+                                    <h3>Guerreiro</h3>
+                                    <p>Mestre do combate físico com força e defesa superiores.</p>
+                                    <ul>
+                                        <li>+5 Força</li>
+                                        <li>+3 Constituição</li>
+                                        <li>+20 Vida</li>
+                                        <li>Habilidade: Golpe Poderoso</li>
+                                    </ul>
+                                </label>
+                            </div>
+                            
+                            <div class="class-option">
+                                <input type="radio" id="mago" name="classe" value="mago">
+                                <label for="mago" class="class-card mago">
+                                    <div class="class-icon"></div>
+                                    <h3>Mago</h3>
+                                    <p>Manipulador de magia arcana com feitiços devastadores.</p>
+                                    <ul>
+                                        <li>+5 Inteligência</li>
+                                        <li>-2 Força</li>
+                                        <li>-10 Vida</li>
+                                        <li>Habilidade: Bola de Fogo</li>
+                                    </ul>
+                                </label>
+                            </div>
+                            
+                            <div class="class-option">
+                                <input type="radio" id="arqueiro" name="classe" value="arqueiro">
+                                <label for="arqueiro" class="class-card arqueiro">
+                                    <div class="class-icon"></div>
+                                    <h3>Arqueiro</h3>
+                                    <p>Especialista em combate à distância com precisão mortal.</p>
+                                    <ul>
+                                        <li>+5 Destreza</li>
+                                        <li>-1 Constituição</li>
+                                        <li>-5 Vida</li>
+                                        <li>Habilidade: Tiro Certeiro</li>
+                                    </ul>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Criar Personagem</button>
+                        <a href="{{ url_for('index') }}" class="btn">Cancelar</a>
+                    </div>
+                </form>
+            </section>
+        </main>
+        
+        <footer>
+            <p>&copy; 2025 Simulador de Batalhas Medievais | Projeto Acadêmico - UnB Gama</p>
+        </footer>
+    </div>
+    
+    <script>
+        // Script para animar a seleção de classe
+        document.addEventListener('DOMContentLoaded', function() {
+            const classOptions = document.querySelectorAll('.class-option input');
+            
+            classOptions.forEach(option => {
+                option.addEventListener('change', function() {
+                    document.querySelectorAll('.class-card').forEach(card => {
+                        card.classList.remove('selected');
+                    });
+                    
+                    if (this.checked) {
+                        this.nextElementSibling.classList.add('selected');
+                    }
+                });
+            });
+            
+            // Selecionar a primeira opção por padrão
+            document.querySelector('.class-option input:checked')
+                .nextElementSibling.classList.add('selected');
+        });
+    </script>
+</body>
+</html>

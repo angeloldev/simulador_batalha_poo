@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventário - {{ personagem.nome }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Inventário de {{ personagem.nome }}</h1>
+            <p>Gerencie os itens e equipamentos do seu personagem</p>
+        </header>
+        
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Início</a></li>
+                <li><a href="{{ url_for('create_character') }}">Criar Personagem</a></li>
+                <li><a href="{{ url_for('battle') }}">Batalhar</a></li>
+                <li><a href="{{ url_for('battle_history') }}">Histórico</a></li>
+            </ul>
+        </nav>
+        
+        <main>
+            <section class="inventory-section">
+                <div class="character-summary {{ personagem.classe.lower() }}">
+                    <div class="character-avatar {{ personagem.classe.lower() }}-avatar"></div>
+                    <div class="character-info">
+                        <h2>{{ personagem.nome }}</h2>
+                        <div class="character-class-badge">{{ personagem.classe }}</div>
+                        <div class="character-level">Nível {{ personagem.nivel }}</div>
+                    </div>
+                </div>
+                
+                <div class="inventory-management">
+                    <div class="equipment-section">
+                        <h3>Equipamentos Atuais</h3>
+                        <div class="equipment-slots">
+                            <div class="equipment-slot">
+                                <div class="slot-name">Arma</div>
+                                <div class="slot-item {% if personagem.equipamentos.arma %}equipped{% endif %}">
+                                    {% if personagem.equipamentos.arma %}
+                                        <div class="item-name">{{ personagem.equipamentos.arma.nome }}</div>
+                                        <div class="item-stats">
+                                            {% if personagem.equipamentos.arma.dano %}
+                                                <span>Dano: {{ personagem.equipamentos.arma.dano }}</span>
+                                            {% endif %}
+                                            
+                                            {% if personagem.equipamentos.arma.bonus %}
+                                                <div class="item-bonuses">
+                                                    {% for atributo, valor in personagem.equipamentos.arma.bonus.items() %}
+                                                        <span>{{ atributo }}: +{{ valor }}</span>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <form method="post" action="{{ url_for('inventory', character_id=personagem.id) }}">
+                                            <input type="hidden" name="action" value="unequip">
+                                            <input type="hidden" name="item_id" value="{{ personagem.equipamentos.arma.id }}">
+                                            <button type="submit" class="btn btn-small">Desequipar</button>
+                                        </form>
+                                    {% else %}
+                                        <div class="empty-slot">Nenhuma arma equipada</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="equipment-slot">
+                                <div class="slot-name">Armadura</div>
+                                <div class="slot-item {% if personagem.equipamentos.armadura %}equipped{% endif %}">
+                                    {% if personagem.equipamentos.armadura %}
+                                        <div class="item-name">{{ personagem.equipamentos.armadura.nome }}</div>
+                                        <div class="item-stats">
+                                            {% if personagem.equipamentos.armadura.defesa %}
+                                                <span>Defesa: {{ personagem.equipamentos.armadura.defesa }}</span>
+                                            {% endif %}
+                                            
+                                            {% if personagem.equipamentos.armadura.bonus %}
+                                                <div class="item-bonuses">
+                                                    {% for atributo, valor in personagem.equipamentos.armadura.bonus.items() %}
+                                                        <span>{{ atributo }}: +{{ valor }}</span>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                            
+                                            {% if personagem.equipamentos.armadura.penalidades %}
+                                                <div class="item-penalties">
+                                                    {% for atributo, valor in personagem.equipamentos.armadura.penalidades.items() %}
+                                                        <span>{{ atributo }}: {{ valor }}</span>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <form method="post" action="{{ url_for('inventory', character_id=personagem.id) }}">
+                                            <input type="hidden" name="action" value="unequip">
+                                            <input type="hidden" name="item_id" value="{{ personagem.equipamentos.armadura.id }}">
+                                            <button type="submit" class="btn btn-small">Desequipar</button>
+                                        </form>
+                                    {% else %}
+                                        <div class="empty-slot">Nenhuma armadura equipada</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="equipment-slot">
+                                <div class="slot-name">Acessório</div>
+                                <div class="slot-item {% if personagem.equipamentos.acessorio %}equipped{% endif %}">
+                                    {% if personagem.equipamentos.acessorio %}
+                                        <div class="item-name">{{ personagem.equipamentos.acessorio.nome }}</div>
+                                        <div class="item-stats">
+                                            <!-- Show accessory stats here -->
+                                        </div>
+                                        <form method="post" action="{{ url_for('inventory', character_id=personagem.id) }}">
+                                            <input type="hidden" name="action" value="unequip">
+                                            <input type="hidden" name="item_id" value="{{ personagem.equipamentos.acessorio.id }}">
+                                            <button type="submit" class="btn btn-small">Desequipar</button>
+                                        </form>
+                                    {% else %}
+                                        <div class="empty-slot">Nenhum acessório equipado</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="inventory-items">
+                        <h3>Itens no Inventário</h3>
+                        
+                        {% if personagem.inventario %}
+                            <div class="item-tabs">
+                                <div class="tab-header">
+                                    <button class="tab-button active" data-tab="all">Todos</button>
+                                    <button class="tab-button" data-tab="arma">Armas</button>
+                                    <button class="tab-button" data-tab="armadura">Armaduras</button>
+                                    <button class="tab-button" data-tab="consumivel">Consumíveis</button>
+                                </div>
+                                
+                                <div class="tab-content" id="tab-all">
+                                    <div class="item-grid">
+                                        {% for item in personagem.inventario %}
+                                            <div class="inventory-item {{ item.tipo }}">
+                                                <div class="item-header">
+                                                    <h4>{{ item.nome }}</h4>
+                                                    <span class="item-type">{{ item.tipo }}</span>
+                                                </div>
+                                                <p class="item-description">{{ item.descricao }}</p>
+                                                
+                                                <div class="item-actions">
+                                                    {% if item.tipo in ['arma', 'armadura', 'acessorio'] %}
+                                                        <form method="post" action="{{ url_for('inventory', character_id=personagem.id) }}">
+                                                            <input type="hidden" name="action" value="equip">
+                                                            <input type="hidden" name="item_id" value="{{ item.id }}">
+                                                            <button type="submit" class="btn btn-small">Equipar</button>
+                                                        </form>
+                                                    {% elif item.tipo == 'consumivel' %}
+                                                        <form method="post" action="{{ url_for('inventory', character_id=personagem.id) }}">
+                                                            <input type="hidden" name="action" value="use">
+                                                            <input type="hidden" name="item_id" value="{{ item.id }}">
+                                                            <button type="submit" class="btn btn-small">Usar</button>
+                                                        </form>
+                                                    {% endif %}
+                                                    
+                                                    <form method="post" action="{{ url_for('inventory', character_id=personagem.id) }}">
+                                                        <input type="hidden" name="action" value="remove">
+                                                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                                                        <button type="submit" class="btn btn-small btn-danger">Descartar</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                
+                                <div class="tab-content" id="tab-arma" style="display: none;">
+                                    <div class="item-grid">
+                                        {% for item in personagem.inventario if item.tipo == 'arma' %}
+                                            <div class="inventory-item arma">
+                                                <div class="item-header">
+                                                    <h4>{{ item.nome }}</h4>
+                                                    <span class="item-type">Arma</span>
+                                                </div>
+                                                <p class="item-description">{{ item.descricao }}</p>
+                                                <div class="item-stats">
+                                                    {% if item.dano %}
+                                                        <span>Dano: {{ item.dano }}</span>
+                                                    {% endif %}
+                                                    
+                                                    {% if item.bonus %}
+                                                        <div class="item-bonuses">
+                                                            {% for atributo, valor in item.bonus.items() %}
+                                                                <span>{{ atributo }}: +{{ valor }}</span>
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                
+                                                <div class="item-actions">
+                                                    <form method="post" action="{{ url_for('inventory', character_id=personagem.id) }}">
+                                                        <input type="hidden" name="action" value="equip">
+                                                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                                                        <button type="submit" class="btn btn-small">Equipar</button>
+                                                    </form>
+                                                    
+                                                    <form method="post" action="{{ url_for('inventory', character_id=personagem.id) }}">
+                                                        <input type="hidden" name="action" value="remove">
+                                                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                                                        <button type="submit" class="btn btn-small btn-danger">Descartar</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <p class="no-items">Nenhuma arma no inventário.</p>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                
+                                <div class="tab-content" id="tab-armadura" style="display: none;">
+                                    <div class="item-grid">
+                                        {% for item in personagem.inventario if item.tipo == 'armadura' %}
+                                            <div class="inventory-item armadura">
+                                                <div class="item-header">
+                                                    <h4>{{ item.nome }}</h4>
+                                                    <span class="item-type">Armadura</span>
+                                                </div>
+                                                <p class="item-description">{{ item.descricao }}</p>
+                                                <div class="item-stats">
+                                                    {% if item.defesa %}
+                                                        <span>Defesa: {{ item.defesa }}</span>
+                                                    {% endif %}
+                                                    
+                                                    {% if item.bonus %}
+                                                        <div class="item-bonuses">
+                                                            {% for atributo, valor in item.bonus.items() %}
+                                                                <span>{{ atributo }}: +{{ valor }}</span>
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% endif %}
+                                                    
+                                                    {% if item.penalidades %}
+                                                        <div class="item-penalties">
+                                                            {% for atributo, valor in item.penalidades.items() %}
+                                                                <span>{{ atributo }}: {{ valor }}</span>
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                
+                                                <div class="item-actions">
+                                                    <form method="post" action="{{ url_for('inventory', character_id=personagem.id) }}">
+                                                        <input type="hidden" name="action" value="equip">
+                                                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                                                        <button type="submit" class="btn btn-small">Equipar</button>
+                                                    </form>
+                                                    
+                                                    <form method="post" action="{{ url_for('inventory', character_id=personagem.id) }}">
+                                                        <input type="hidden" name="action" value="remove">
+                                                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                                                        <button type="submit" class="btn btn-small btn-danger">Descartar</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <p class="no-items">Nenhuma armadura no inventário.</p>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                
+                                <div class="tab-content" id="tab-consumivel" style="display: none;">
+                                    <div class="item-grid">
+                                        {% for item in personagem.inventario if item.tipo == 'consumivel' %}
+                                            <div class="inventory-item consumivel">
+                                                <div class="item-header">
+                                                    <h4>{{ item.nome }}</h4>
+                                                    <span class="item-type">Consumível</span>
+                                                </div>
+                                                <p class="item-description">{{ item.descricao }}</p>
+                                                <div class="item-stats">
+                                                    {% if item.efeito %}
+                                                        <div class="item-effect">
+                                                            {% if item.efeito.tipo == 'cura' %}
+                                                                <span>Cura: {{ item.efeito.valor }} pontos de vida</span>
+                                                            {% elif item.efeito.tipo == 'bonus' %}
+                                                                <span>Bônus: +{{ item.efeito.valor }} {{ item.efeito.atributo }}</span>
+                                                                <span>Duração: {{ item.duracao }} turnos</span>
+                                                            {% endif %}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                
+                                                <div class="item-actions">
+                                                    <form method="post" action="{{ url_for('inventory', character_id=personagem.id) }}">
+                                                        <input type="hidden" name="action" value="use">
+                                                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                                                        <button type="submit" class="btn btn-small">Usar</button>
+                                                    </form>
+                                                    
+                                                    <form method="post" action="{{ url_for('inventory', character_id=personagem.id) }}">
+                                                        <input type="hidden" name="action" value="remove">
+                                                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                                                        <button type="submit" class="btn btn-small btn-danger">Descartar</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <p class="no-items">Nenhum consumível no inventário.</p>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="no-items">
+                                <p>Inventário vazio.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="inventory-actions">
+                    <a href="{{ url_for('view_character', character_id=personagem.id) }}" class="btn btn-primary">Voltar para Detalhes</a>
+                    <a href="{{ url_for('index') }}" class="btn">Voltar ao Início</a>
+                </div>
+            </section>
+        </main>
+        
+        <footer>
+            <p>&copy; 2025 Simulador de Batalhas Medievais | Projeto Acadêmico - UnB Gama</p>
+        </footer>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab functionality
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    // Hide all tab contents
+                    tabContents.forEach(content => content.style.display = 'none');
+                    
+                    // Show the selected tab content
+                    const tabId = 'tab-' + this.getAttribute('data-tab');
+                    document.getElementById(tabId).style.display = 'block';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

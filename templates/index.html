@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Batalhas Medievais</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Simulador de Batalhas Medievais</h1>
+            <p>Bem-vindo ao mundo de Eldoria, onde guerreiros, magos e arqueiros disputam pela glória!</p>
+        </header>
+        
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}" class="active">Início</a></li>
+                <li><a href="{{ url_for('create_character') }}">Criar Personagem</a></li>
+                <li><a href="{{ url_for('battle') }}">Batalhar</a></li>
+                <li><a href="{{ url_for('battle_history') }}">Histórico</a></li>
+            </ul>
+        </nav>
+        
+        <main>
+            <section class="welcome-section">
+                <div class="world-intro">
+                    <h2>O Mundo de Eldoria</h2>
+                    <p>Eldoria é um reino medieval onde a magia e a perícia marcial coexistem. Diferentes classes de personagens dominam habilidades únicas:</p>
+                    <ul>
+                        <li><strong>Guerreiros:</strong> Mestres do combate físico com força e defesa superiores</li>
+                        <li><strong>Magos:</strong> Manipuladores da magia arcana com feitiços poderosos</li>
+                        <li><strong>Arqueiros:</strong> Especialistas em combate à distância com precisão letal</li>
+                    </ul>
+                </div>
+                
+                <div class="game-features">
+                    <h2>Recursos do Simulador</h2>
+                    <ul>
+                        <li>Crie personagens personalizados de diferentes classes</li>
+                        <li>Equipe itens e armas para aumentar suas estatísticas</li>
+                        <li>Participe de batalhas por turnos usando ataques e habilidades especiais</li>
+                        <li>Acompanhe seu progresso e histórico de batalhas</li>
+                    </ul>
+                </div>
+            </section>
+            
+            <section class="characters-section">
+                <h2>Seus Personagens</h2>
+                
+                {% if personagens %}
+                    <div class="character-list">
+                        {% for personagem in personagens %}
+                            <div class="character-card {{ personagem.classe.lower() }}">
+                                <div class="character-header">
+                                    <h3>{{ personagem.nome }}</h3>
+                                    <span class="character-class">{{ personagem.classe }}</span>
+                                </div>
+                                <div class="character-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-label">Nível:</span>
+                                        <span class="stat-value">{{ personagem.nivel }}</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">Vida:</span>
+                                        <div class="health-bar">
+                                            <div class="health-fill" style="width: {{ (personagem.vida_atual / personagem.vida_maxima) * 100 }}%"></div>
+                                        </div>
+                                        <span class="stat-value">{{ personagem.vida_atual }}/{{ personagem.vida_maxima }}</span>
+                                    </div>
+                                </div>
+                                <div class="character-actions">
+                                    <a href="{{ url_for('view_character', character_id=personagem.id) }}" class="btn">Detalhes</a>
+                                    <a href="{{ url_for('inventory', character_id=personagem.id) }}" class="btn">Inventário</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="no-characters">
+                        <p>Você ainda não possui personagens.</p>
+                        <a href="{{ url_for('create_character') }}" class="btn btn-primary">Criar Personagem</a>
+                    </div>
+                {% endif %}
+            </section>
+            
+            <section class="quick-actions">
+                <h2>Ações Rápidas</h2>
+                <div class="action-buttons">
+                    <a href="{{ url_for('create_character') }}" class="btn btn-primary">Criar Novo Personagem</a>
+                    <a href="{{ url_for('battle') }}" class="btn btn-danger">Iniciar Batalha</a>
+                    <a href="{{ url_for('battle_history') }}" class="btn btn-secondary">Ver Histórico de Batalhas</a>
+                </div>
+            </section>
+        </main>
+        
+        <footer>
+            <p>&copy; 2025 Simulador de Batalhas Medievais | Projeto Acadêmico - UnB Gama</p>
+        </footer>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

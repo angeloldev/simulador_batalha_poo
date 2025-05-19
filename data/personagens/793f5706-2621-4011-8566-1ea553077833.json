@@ -1,0 +1,67 @@
+{
+  "id": "793f5706-2621-4011-8566-1ea553077833",
+  "nome": "Paulao",
+  "classe": "Mago",
+  "nivel": 1,
+  "experiencia": 0,
+  "vida_maxima": 90,
+  "vida_atual": 90,
+  "forca": 8,
+  "destreza": 10,
+  "inteligencia": 15,
+  "constituicao": 10,
+  "habilidades": [
+    {
+      "id": "bola_de_fogo",
+      "nome": "Bola de Fogo",
+      "descricao": "Conjura uma bola de fogo que causa dano ao alvo",
+      "custo": 25,
+      "tipo": "ataque",
+      "elemento": "fogo",
+      "multiplicador": 2.0
+    },
+    {
+      "id": "raio_de_gelo",
+      "nome": "Raio de Gelo",
+      "descricao": "Conjura um raio de gelo que causa dano e reduz a velocidade do alvo",
+      "custo": 30,
+      "tipo": "ataque",
+      "elemento": "gelo",
+      "multiplicador": 1.6,
+      "efeito": "lentidao"
+    },
+    {
+      "id": "barreira_arcana",
+      "nome": "Barreira Arcana",
+      "descricao": "Cria uma barreira mágica que absorve dano",
+      "custo": 35,
+      "tipo": "defesa",
+      "duracao": 2,
+      "absorve_dano": 40
+    },
+    {
+      "id": "mudar_elemento",
+      "nome": "Mudar Elemento",
+      "descricao": "Muda o elemento ativo do mago",
+      "custo": 10,
+      "tipo": "utilidade",
+      "elementos_disponiveis": [
+        "fogo",
+        "gelo",
+        "raio",
+        "arcano"
+      ]
+    }
+  ],
+  "inventario": [],
+  "equipamentos": {
+    "arma": null,
+    "armadura": null,
+    "acessorio": null
+  },
+  "estado_defesa": false,
+  "mana": 100,
+  "mana_maxima": 100,
+  "elemento_ativo": "fogo",
+  "elemental_damage_multiplier": 1.0
+}

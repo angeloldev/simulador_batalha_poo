@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Combate em Andamento - Simulador de Batalhas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container battle-container">
+        <header>
+            <h1>Combate em Andamento</h1>
+            <p>Turno {{ combate.turno_atual }} - {{ combate.personagem_ativo.nome }} deve agir</p>
+        </header>
+        
+        <main>
+            <section class="battle-arena">
+                <div class="combatants">
+                    <div class="combatant {{ combate.personagem1.classe.lower() }} {% if combate.personagem_ativo.id == combate.personagem1.id %}active{% endif %}">
+                        <div class="character-avatar {{ combate.personagem1.classe.lower() }}-avatar"></div>
+                        <div class="character-info">
+                            <h2>{{ combate.personagem1.nome }}</h2>
+                            <div class="character-class-badge">{{ combate.personagem1.classe }}</div>
+                            <div class="health-container">
+                                <div class="health-bar">
+                                    <div class="health-fill" style="width: {{ (combate.personagem1.vida_atual / combate.personagem1.vida_maxima) * 100 }}%"></div>
+                                </div>
+                                <span class="health-text">{{ combate.personagem1.vida_atual }} / {{ combate.personagem1.vida_maxima }}</span>
+                            </div>
+                            
+                            {% if combate.personagem1.classe == "Guerreiro" %}
+                                <div class="resource-container">
+                                    <div class="resource-bar fury">
+                                        <div class="resource-fill" style="width: {{ (combate.personagem1.furia / combate.personagem1.furia_maxima) * 100 }}%"></div>
+                                    </div>
+                                    <span class="resource-text">Fúria: {{ combate.personagem1.furia }} / {{ combate.personagem1.furia_maxima }}</span>
+                                </div>
+                            {% elif combate.personagem1.classe == "Mago" %}
+                                <div class="resource-container">
+                                    <div class="resource-bar mana">
+                                        <div class="resource-fill" style="width: {{ (combate.personagem1.mana / combate.personagem1.mana_maxima) * 100 }}%"></div>
+                                    </div>
+                                    <span class="resource-text">Mana: {{ combate.personagem1.mana }} / {{ combate.personagem1.mana_maxima }}</span>
+                                </div>
+                            {% elif combate.personagem1.classe == "Arqueiro" %}
+                                <div class="resource-container">
+                                    <div class="resource-bar stamina">
+                                        <div class="resource-fill" style="width: {{ (combate.personagem1.stamina / combate.personagem1.stamina_maxima) * 100 }}%"></div>
+                                    </div>
+                                    <span class="resource-text">Stamina: {{ combate.personagem1.stamina }} / {{ combate.personagem1.stamina_maxima }}</span>
+                                </div>
+                                <div class="ammo">Flechas: {{ combate.personagem1.municao }}</div>
+                            {% endif %}
+                            
+                            {% if combate.personagem1.estado_defesa %}
+                                <div class="status-effect defending">Defendendo</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="battle-actions-container">
+                        {% if not combate.finalizado and combate.personagem_ativo %}
+                            <div class="battle-actions" id="battle-actions">
+                                <h3>Ações Disponíveis</h3>
+                                <div class="action-buttons">
+                                    <button type="button" class="btn btn-action" onclick="executarAcao('atacar')">Atacar</button>
+                                    <button type="button" class="btn btn-action" onclick="executarAcao('defender')">Defender</button>
+                                    
+                                    <div class="abilities-dropdown">
+                                        <button type="button" class="btn btn-ability" onclick="toggleHabilidades()">Habilidades ▼</button>
+                                        <div class="abilities-list" id="abilities-list">
+                                            {% set active_char = combate.personagem1 if combate.personagem_ativo.id == combate.personagem1.id else combate.personagem2 %}
+                                            {% for habilidade in active_char.habilidades %}
+                                                <button type="button" class="ability-item" onclick="executarHabilidade('{{ habilidade.id }}')">
+                                                    {{ habilidade.nome }}
+                                                    <span class="ability-cost">
+                                                        {% if active_char.classe == "Guerreiro" %}
+                                                            {{ habilidade.custo }} Fúria
+                                                        {% elif active_char.classe == "Mago" %}
+                                                            {{ habilidade.custo }} Mana
+                                                        {% elif active_char.classe == "Arqueiro" %}
+                                                            {{ habilidade.custo }} Stamina
+                                                        {% endif %}
+                                                    </span>
+                                                </button>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% elif combate.finalizado %}
+                            <div class="battle-result">
+                                <h3>Combate Finalizado!</h3>
+                                <p class="winner-announcement">{{ combate.vencedor.nome }} é o vencedor!</p>
+                                <div class="post-battle-actions">
+                                    <a href="{{ url_for('battle') }}" class="btn btn-primary">Nova Batalha</a>
+                                    <a href="{{ url_for('battle_history') }}" class="btn">Ver Histórico</a>
+                                    <a href="{{ url_for('index') }}" class="btn">Voltar ao Início</a>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="combatant {{ combate.personagem2.classe.lower() }} {% if combate.personagem_ativo.id == combate.personagem2.id %}active{% endif %}">
+                        <div class="character-avatar {{ combate.personagem2.classe.lower() }}-avatar"></div>
+                        <div class="character-info">
+                            <h2>{{ combate.personagem2.nome }}</h2>
+                            <div class="character-class-badge">{{ combate.personagem2.classe }}</div>
+                            <div class="health-container">
+                                <div class="health-bar">
+                                    <div class="health-fill" style="width: {{ (combate.personagem2.vida_atual / combate.personagem2.vida_maxima) * 100 }}%"></div>
+                                </div>
+                                <span class="health-text">{{ combate.personagem2.vida_atual }} / {{ combate.personagem2.vida_maxima }}</span>
+                            </div>
+                            
+                            {% if combate.personagem2.classe == "Guerreiro" %}
+                                <div class="resource-container">
+                                    <div class="resource-bar fury">
+                                        <div class="resource-fill" style="width: {{ (combate.personagem2.furia / combate.personagem2.furia_maxima) * 100 }}%"></div>
+                                    </div>
+                                    <span class="resource-text">Fúria: {{ combate.personagem2.furia }} / {{ combate.personagem2.furia_maxima }}</span>
+                                </div>
+                            {% elif combate.personagem2.classe == "Mago" %}
+                                <div class="resource-container">
+                                    <div class="resource-bar mana">
+                                        <div class="resource-fill" style="width: {{ (combate.personagem2.mana / combate.personagem2.mana_maxima) * 100 }}%"></div>
+                                    </div>
+                                    <span class="resource-text">Mana: {{ combate.personagem2.mana }} / {{ combate.personagem2.mana_maxima }}</span>
+                                </div>
+                            {% elif combate.personagem2.classe == "Arqueiro" %}
+                                <div class="resource-container">
+                                    <div class="resource-bar stamina">
+                                        <div class="resource-fill" style="width: {{ (combate.personagem2.stamina / combate.personagem2.stamina_maxima) * 100 }}%"></div>
+                                    </div>
+                                    <span class="resource-text">Stamina: {{ combate.personagem2.stamina }} / {{ combate.personagem2.stamina_maxima }}</span>
+                                </div>
+                                <div class="ammo">Flechas: {{ combate.personagem2.municao }}</div>
+                            {% endif %}
+                            
+                            {% if combate.personagem2.estado_defesa %}
+                                <div class="status-effect defending">Defendendo</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="battle-log">
+                <h3>Registro de Batalha</h3>
+                <div class="log-entries" id="log-entries">
+                    {% for entry in combate.log_combate %}
+                        <div class="log-entry">
+                            <span class="log-turn">Turno {{ entry.turno }}</span>
+                            {% if entry.acao == "ataque" %}
+                                <span class="log-action attack">{{ entry.atacante }} atacou {{ entry.defensor }} causando {{ entry.dano }} de dano.</span>
+                            {% elif entry.acao == "defesa" %}
+                                <span class="log-action defense">{{ entry.personagem }} assumiu postura defensiva.</span>
+                            {% elif entry.acao == "habilidade" %}
+                                <span class="log-action ability">{{ entry.usuario }} usou {{ entry.habilidade }}.</span>
+                                {% if entry.resultado.alvo %}
+                                    <span class="log-detail">Causou {{ entry.resultado.dano }} de dano em {{ entry.resultado.alvo }}.</span>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        </main>
+        
+        <footer>
+            <p>&copy; 2025 Simulador de Batalhas Medievais | Projeto Acadêmico - UnB Gama</p>
+        </footer>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Scroll battle log to bottom
+            const logEntries = document.getElementById('log-entries');
+            logEntries.scrollTop = logEntries.scrollHeight;
+        });
+
+        function toggleHabilidades() {
+            const abilitiesList = document.getElementById('abilities-list');
+            abilitiesList.classList.toggle('show');
+            
+            // Close when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!event.target.closest('.abilities-dropdown')) {
+                    abilitiesList.classList.remove('show');
+                }
+            });
+        }
+
+        async function executarAcao(acao) {
+            try {
+                const response = await fetch(`/battle/{{ combate.id }}/action`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `action=${acao}`
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erro ao executar ação');
+                }
+
+                const data = await response.json();
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+
+                window.location.reload();
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Ocorreu um erro ao executar a ação.');
+            }
+        }
+
+        async function executarHabilidade(habilidadeId) {
+            try {
+                const response = await fetch(`/battle/{{ combate.id }}/action`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `action=habilidade&habilidade_id=${habilidadeId}`
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erro ao executar habilidade');
+                }
+
+                const data = await response.json();
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+
+                window.location.reload();
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Ocorreu um erro ao executar a habilidade.');
+            }
+        }
+    </script>
+</body>
+</html>

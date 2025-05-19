@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico de Batalhas - Simulador de Batalhas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Histórico de Batalhas</h1>
+            <p>Registro das batalhas realizadas em Eldoria</p>
+        </header>
+        
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Início</a></li>
+                <li><a href="{{ url_for('create_character') }}">Criar Personagem</a></li>
+                <li><a href="{{ url_for('battle') }}">Batalhar</a></li>
+                <li><a href="{{ url_for('battle_history') }}" class="active">Histórico</a></li>
+            </ul>
+        </nav>
+        
+        <main>
+            <section class="history-section">
+                {% if historico %}
+                    <div class="battle-history-list">
+                        {% for combate in historico %}
+                            <div class="battle-record">
+                                <div class="battle-header">
+                                    <div class="battle-info">
+                                        <h3>Combate #{{ loop.index }}</h3>
+                                        <span class="battle-date">{{ combate.data if combate.data else "Data não registrada" }}</span>
+                                    </div>
+                                    <div class="battle-status">
+                                        <span class="battle-turn-count">{{ combate.turnos }} turnos</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="battle-participants">
+                                    <div class="participant {{ combate.personagem1.classe.lower() }} {% if combate.vencedor and combate.vencedor.id == combate.personagem1.id %}winner{% endif %}">
+                                        <div class="participant-avatar {{ combate.personagem1.classe.lower() }}-avatar"></div>
+                                        <div class="participant-info">
+                                            <h4>{{ combate.personagem1.nome }}</h4>
+                                            <span class="participant-class">{{ combate.personagem1.classe }}</span>
+                                            {% if combate.vencedor and combate.vencedor.id == combate.personagem1.id %}
+                                                <div class="winner-badge">Vencedor</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="versus">VS</div>
+                                    
+                                    <div class="participant {{ combate.personagem2.classe.lower() }} {% if combate.vencedor and combate.vencedor.id == combate.personagem2.id %}winner{% endif %}">
+                                        <div class="participant-avatar {{ combate.personagem2.classe.lower() }}-avatar"></div>
+                                        <div class="participant-info">
+                                            <h4>{{ combate.personagem2.nome }}</h4>
+                                            <span class="participant-class">{{ combate.personagem2.classe }}</span>
+                                            {% if combate.vencedor and combate.vencedor.id == combate.personagem2.id %}
+                                                <div class="winner-badge">Vencedor</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="battle-details-toggle">
+                                    <button class="toggle-button" onclick="toggleBattleLog({{ loop.index }})">
+                                        Ver Detalhes <span class="toggle-icon">▼</span>
+                                    </button>
+                                </div>
+                                
+                                <div class="battle-log-container" id="battle-log-{{ loop.index }}" style="display: none;">
+                                    <h4>Registro do Combate</h4>
+                                    <div class="battle-log">
+                                        {% if combate.log %}
+                                            {% for entry in combate.log %}
+                                                <div class="log-entry">
+                                                    <span class="log-turn">Turno {{ entry.turno }}</span>
+                                                    
+                                                    {% if entry.acao == "ataque" %}
+                                                        <span class="log-action attack">{{ entry.atacante }} atacou {{ entry.defensor }} causando {{ entry.dano }} de dano.</span>
+                                                    {% elif entry.acao == "defesa" %}
+                                                        <span class="log-action defense">{{ entry.personagem }} assumiu postura defensiva.</span>
+                                                    {% elif entry.acao == "habilidade" %}
+                                                        <span class="log-action ability">{{ entry.usuario }} usou {{ entry.habilidade }}.</span>
+                                                        {% if entry.resultado.alvo %}
+                                                            <span class="log-detail">Causou {{ entry.resultado.dano }} de dano em {{ entry.resultado.alvo }}.</span>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <p class="no-log">Detalhes do combate não disponíveis.</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="no-history">
+                        <h2>Nenhuma batalha registrada</h2>
+                        <p>O histórico de batalhas está vazio. Inicie um combate para registrar seu resultado aqui.</p>
+                        <a href="{{ url_for('battle') }}" class="btn btn-primary">Iniciar Batalha</a>
+                    </div>
+                {% endif %}
+            </section>
+        </main>
+        
+        <footer>
+            <p>&copy; 2025 Simulador de Batalhas Medievais | Projeto Acadêmico - UnB Gama</p>
+        </footer>
+    </div>
+    
+    <script>
+        function toggleBattleLog(index) {
+            const logElement = document.getElementById(`battle-log-${index}`);
+            const toggleButton = logElement.previousElementSibling.querySelector('.toggle-button');
+            const toggleIcon = toggleButton.querySelector('.toggle-icon');
+            
+            if (logElement.style.display === 'none') {
+                logElement.style.display = 'block';
+                toggleIcon.textContent = '▲';
+                toggleButton.textContent = toggleButton.textContent.replace('Ver Detalhes', 'Ocultar Detalhes');
+            } else {
+                logElement.style.display = 'none';
+                toggleIcon.textContent = '▼';
+                toggleButton.textContent = toggleButton.textContent.replace('Ocultar Detalhes', 'Ver Detalhes');
+            }
+        }
+    </script>
+</body>
+</html>
