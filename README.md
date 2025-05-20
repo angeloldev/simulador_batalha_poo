@@ -27,6 +27,3 @@ O simulador é ambientado no reino de Eldoria, um mundo de fantasia medieval ond
 2. O sistema inicializa a arena de batalha
 3. A batalha prossegue com acções por turnos
 4. O sistema regista e apresenta as acções de batalha
-5. O vencedor é det
-
-Traduzido com a versão gratuita do tradutor - DeepL.com
