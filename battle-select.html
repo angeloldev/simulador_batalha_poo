@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selecionar Batalha - Simulador de Batalha</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Simulador de Batalha</h1>
+        
+        <nav class="main-nav">
+            <ul>
+                <li><a href="index.html">Início</a></li>
+                <li><a href="characters.html">Personagens</a></li>
+                <li><a href="battle-select.html" class="active">Iniciar Batalha</a></li>
+                <li><a href="battle-history.html">Histórico</a></li>
+            </ul>
+        </nav>
+        
+        <div class="page-content">
+            <h2>Selecionar Personagens para Batalha</h2>
+            
+            <div class="battle-selection-area" id="battle-selection">
+                <!-- Conteúdo será preenchido pelo JavaScript -->
+                <div class="empty-message" id="not-enough-characters">
+                    <p>Você precisa de pelo menos 2 personagens para iniciar uma batalha.</p>
+                    <p><a href="characters.html" class="btn">Criar Personagens</a></p>
+                </div>
+                
+                <div class="battle-selection-content" id="selection-content" style="display:none;">
+                    <div class="selection-form">
+                        <div class="combatants">
+                            <div class="combatant-selection">
+                                <h3>Personagem 1</h3>
+                                <select id="player1-select">
+                                    <option value="">Selecione um personagem...</option>
+                                    <!-- Opções serão preenchidas pelo JavaScript -->
+                                </select>
+                                <div class="character-preview" id="player1-preview">
+                                    <!-- Prévia do personagem 1 -->
+                                </div>
+                            </div>
+                            
+                            <div class="versus-display">VS</div>
+                            
+                            <div class="combatant-selection">
+                                <h3>Personagem 2</h3>
+                                <select id="player2-select">
+                                    <option value="">Selecione um personagem...</option>
+                                    <!-- Opções serão preenchidas pelo JavaScript -->
+                                </select>
+                                <div class="character-preview" id="player2-preview">
+                                    <!-- Prévia do personagem 2 -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="battle-start-actions">
+                            <button id="start-battle-btn" class="btn start-btn" disabled>Iniciar Batalha</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/main.js"></script>
+    <script src="js/battle-select.js"></script>
+</body>
+</html> 

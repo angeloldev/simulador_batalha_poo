@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Personagens - Simulador de Batalha</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Simulador de Batalha</h1>
+        
+        <nav class="main-nav">
+            <ul>
+                <li><a href="index.html">Início</a></li>
+                <li><a href="characters.html" class="active">Personagens</a></li>
+                <li><a href="battle-select.html">Iniciar Batalha</a></li>
+                <li><a href="battle-history.html">Histórico</a></li>
+            </ul>
+        </nav>
+        
+        <div class="page-content">
+            <div class="header-with-actions">
+                <h2>Gerenciar Personagens</h2>
+                <button id="new-character-btn" class="btn">Novo Personagem</button>
+            </div>
+            
+            <div class="character-list" id="character-list">
+                <!-- Lista de personagens será preenchida dinamicamente -->
+                <div class="empty-message" id="empty-characters">
+                    <p>Você ainda não criou nenhum personagem.</p>
+                    <p>Clique em "Novo Personagem" para começar!</p>
+                </div>
+            </div>
+            
+            <!-- Modal para criação/edição de personagem -->
+            <div class="modal" id="character-modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 id="modal-title">Novo Personagem</h3>
+                        <button class="close-btn" id="close-modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="character-form">
+                            <input type="hidden" id="character-id">
+                            
+                            <div class="form-group">
+                                <label for="character-name">Nome:</label>
+                                <input type="text" id="character-name" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Classe:</label>
+                                <div class="class-options">
+                                    <div class="class-option">
+                                        <input type="radio" id="class-guerreiro" name="character-class" value="guerreiro" required>
+                                        <label for="class-guerreiro" class="class-card guerreiro">
+                                            <div class="class-icon guerreiro-icon"></div>
+                                            <h4>Guerreiro</h4>
+                                            <p>Alta resistência e força, especialista em combate corpo a corpo.</p>
+                                            <ul class="stat-preview">
+                                                <li>Vida: 120</li>
+                                                <li>Força: 10</li>
+                                                <li>Defesa: 8</li>
+                                            </ul>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="class-option">
+                                        <input type="radio" id="class-mago" name="character-class" value="mago">
+                                        <label for="class-mago" class="class-card mago">
+                                            <div class="class-icon mago-icon"></div>
+                                            <h4>Mago</h4>
+                                            <p>Alto poder de ataque mágico, mas baixa resistência.</p>
+                                            <ul class="stat-preview">
+                                                <li>Vida: 80</li>
+                                                <li>Força: 14</li>
+                                                <li>Defesa: 4</li>
+                                            </ul>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="class-option">
+                                        <input type="radio" id="class-arqueiro" name="character-class" value="arqueiro">
+                                        <label for="class-arqueiro" class="class-card arqueiro">
+                                            <div class="class-icon arqueiro-icon"></div>
+                                            <h4>Arqueiro</h4>
+                                            <p>Equilibra ataque à distância com mobilidade.</p>
+                                            <ul class="stat-preview">
+                                                <li>Vida: 90</li>
+                                                <li>Força: 12</li>
+                                                <li>Defesa: 5</li>
+                                            </ul>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" class="btn submit-btn">Salvar Personagem</button>
+                                <button type="button" class="btn cancel-btn" id="cancel-btn">Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Confirmação de exclusão -->
+            <div class="modal" id="confirm-delete-modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Confirmar Exclusão</h3>
+                        <button class="close-btn" id="close-confirm">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Tem certeza que deseja excluir este personagem?</p>
+                        <p>Esta ação não pode ser desfeita.</p>
+                        <div class="form-actions">
+                            <button class="btn delete-btn" id="confirm-delete">Excluir</button>
+                            <button class="btn cancel-btn" id="cancel-delete">Cancelar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/characters.js"></script>
+</body>
+</html> 

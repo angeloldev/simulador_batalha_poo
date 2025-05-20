@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batalha - Simulador de Batalha</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container battle-container">
+        <h1>Simulador de Batalha</h1>
+        
+        <nav class="main-nav">
+            <ul>
+                <li><a href="index.html">Início</a></li>
+                <li><a href="characters.html">Personagens</a></li>
+                <li><a href="battle-select.html">Iniciar Batalha</a></li>
+                <li><a href="battle-history.html">Histórico</a></li>
+            </ul>
+        </nav>
+        
+        <div class="page-content">
+            <div class="battle-header">
+                <h2>Batalha em Andamento</h2>
+                <div id="battle-info">
+                    <span id="turn-counter">Turno 1</span>
+                </div>
+            </div>
+            
+            <div class="battle-area">
+                <div class="character player" id="player1-container">
+                    <h2 id="player1-name">Jogador 1</h2>
+                    <div class="character-avatar" id="player1-avatar"></div>
+                    <div class="stats">
+                        <div class="stat-bar">
+                            <div class="stat-label">Vida: <span id="player1-health">100</span>/<span id="player1-max-health">100</span></div>
+                            <div class="health-bar">
+                                <div class="health-fill" id="player1-health-bar" style="width: 100%;"></div>
+                            </div>
+                        </div>
+                        <div class="stat-row">
+                            <div class="stat">Força: <span id="player1-strength">10</span></div>
+                            <div class="stat">Defesa: <span id="player1-defense">5</span></div>
+                        </div>
+                        <div id="player1-status" class="character-status"></div>
+                    </div>
+                </div>
+
+                <div class="battle-status">
+                    <div id="battle-message">Batalha iniciada!</div>
+                    <div class="vs">VS</div>
+                </div>
+
+                <div class="character enemy" id="player2-container">
+                    <h2 id="player2-name">Jogador 2</h2>
+                    <div class="character-avatar" id="player2-avatar"></div>
+                    <div class="stats">
+                        <div class="stat-bar">
+                            <div class="stat-label">Vida: <span id="player2-health">100</span>/<span id="player2-max-health">100</span></div>
+                            <div class="health-bar">
+                                <div class="health-fill" id="player2-health-bar" style="width: 100%;"></div>
+                            </div>
+                        </div>
+                        <div class="stat-row">
+                            <div class="stat">Força: <span id="player2-strength">8</span></div>
+                            <div class="stat">Defesa: <span id="player2-defense">3</span></div>
+                        </div>
+                        <div id="player2-status" class="character-status"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="active-player-info" id="active-player-info">
+                <h3>Turno de: <span id="active-player-name">Jogador 1</span></h3>
+            </div>
+            
+            <div class="controls">
+                <button id="attack-btn" class="btn">Atacar</button>
+                <button id="special-btn" class="btn">Ataque Especial</button>
+                <button id="heal-btn" class="btn">Curar</button>
+                <button id="defend-btn" class="btn">Defender</button>
+            </div>
+
+            <div class="battle-log">
+                <h3>Registro de Batalha</h3>
+                <div id="log-messages"></div>
+            </div>
+            
+            <div id="battle-result" class="battle-result" style="display: none;">
+                <h3>Batalha Finalizada!</h3>
+                <div id="winner-message" class="winner-message"></div>
+                <div class="battle-actions">
+                    <button id="return-btn" class="btn">Voltar à Seleção</button>
+                    <button id="save-battle-btn" class="btn">Salvar Batalha</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/battle.js"></script>
+</body>
+</html> 

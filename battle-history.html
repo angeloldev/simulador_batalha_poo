@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico de Batalhas - Simulador de Batalha</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Simulador de Batalha</h1>
+        
+        <nav class="main-nav">
+            <ul>
+                <li><a href="index.html">Início</a></li>
+                <li><a href="characters.html">Personagens</a></li>
+                <li><a href="battle-select.html">Iniciar Batalha</a></li>
+                <li><a href="battle-history.html" class="active">Histórico</a></li>
+            </ul>
+        </nav>
+        
+        <div class="page-content">
+            <h2>Histórico de Batalhas</h2>
+            
+            <div class="battle-history" id="battle-history">
+                <!-- Histórico será preenchido pelo JavaScript -->
+                <div class="empty-message" id="no-history">
+                    <p>Ainda não há batalhas no histórico.</p>
+                    <p>Complete uma batalha e salve o resultado para ver aqui.</p>
+                    <p><a href="battle-select.html" class="btn">Iniciar Batalha</a></p>
+                </div>
+                
+                <div id="history-list"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para detalhes da batalha -->
+    <div class="modal" id="battle-details-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Detalhes da Batalha</h3>
+                <button class="close-btn" id="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="battle-combatants" id="modal-combatants">
+                    <!-- Combatentes -->
+                </div>
+                
+                <div class="battle-info" id="modal-battle-info">
+                    <!-- Informações da batalha -->
+                </div>
+                
+                <div class="battle-log-detail">
+                    <h4>Histórico de Ações</h4>
+                    <div id="modal-battle-log" class="battle-log-container">
+                        <!-- Log da batalha -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/main.js"></script>
+    <script src="js/battle-history.js"></script>
+</body>
+</html> 

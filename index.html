@@ -1,13 +1,67 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Python Character Battle Simulator</title>
+    <title>Simulador de Batalha</title>
+    <link rel="stylesheet" href="css/style.css">
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <div class="container">
+      <h1>Simulador de Batalha</h1>
+      
+      <nav class="main-nav">
+        <ul>
+          <li><a href="index.html" class="active">Início</a></li>
+          <li><a href="characters.html">Personagens</a></li>
+          <li><a href="battle-select.html">Iniciar Batalha</a></li>
+          <li><a href="battle-history.html">Histórico</a></li>
+        </ul>
+      </nav>
+      
+      <div class="welcome-section">
+        <h2>Bem-vindo ao Simulador de Batalha!</h2>
+        <p>Um jogo de estratégia por turnos onde você pode criar e customizar personagens de diferentes classes para batalhar.</p>
+        
+        <div class="feature-cards">
+          <div class="feature-card">
+            <div class="feature-icon guerreiro-icon"></div>
+            <h3>Crie Personagens</h3>
+            <p>Escolha entre Guerreiros, Magos e Arqueiros, cada um com habilidades únicas.</p>
+            <a href="characters.html" class="btn">Gerenciar Personagens</a>
+          </div>
+          
+          <div class="feature-card">
+            <div class="feature-icon battle-icon"></div>
+            <h3>Batalhe</h3>
+            <p>Escolha dois personagens para lutar em combates por turnos estratégicos.</p>
+            <a href="battle-select.html" class="btn">Iniciar Batalha</a>
+          </div>
+          
+          <div class="feature-card">
+            <div class="feature-icon history-icon"></div>
+            <h3>Histórico</h3>
+            <p>Veja o histórico de batalhas e acompanhe o desempenho de seus personagens.</p>
+            <a href="battle-history.html" class="btn">Ver Histórico</a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="quick-start">
+        <h2>Começar Rapidamente</h2>
+        <p>Novo no jogo? Siga esses passos:</p>
+        <ol class="steps">
+          <li><strong>Crie Personagens</strong> - Vá para a seção de personagens e crie pelo menos dois personagens</li>
+          <li><strong>Inicie uma Batalha</strong> - Selecione dois personagens para lutar entre si</li>
+          <li><strong>Use Estratégia</strong> - Cada classe tem pontos fortes e fracos. Use-os sabiamente!</li>
+        </ol>
+        <div class="action-buttons">
+          <a href="characters.html" class="btn">Criar Personagem</a>
+          <a href="battle-select.html" class="btn">Iniciar Batalha</a>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/main.js"></script>
   </body>
 </html>
