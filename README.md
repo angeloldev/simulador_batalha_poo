@@ -38,28 +38,9 @@ git clone <url-do-repositorio>
 cd medieval-battle-simulator
 ```
 
-### 2. Crie um ambiente virtual
-```bash
-# Windows
-python -m venv venv
-venv\Scripts\activate
-
-# Linux/Mac
-python3 -m venv venv
-source venv/bin/activate
-```
-
-### 3. Instale as dependências
+### 2. Instale as dependências
 ```bash
 pip install -r requirements.txt
-```
-
-### 4. Configure variáveis de ambiente (opcional)
-Crie um arquivo `.env` na raiz do projeto:
-```env
-SECRET_KEY=sua-chave-secreta-super-segura-aqui
-FLASK_ENV=development
-DATABASE_URL=sqlite:///battle_simulator.db
 ```
 
 ## 🚀 Como Executar
@@ -67,12 +48,6 @@ DATABASE_URL=sqlite:///battle_simulator.db
 ### Desenvolvimento
 ```bash
 python app.py
-```
-
-### Produção (com Gunicorn)
-```bash
-pip install gunicorn
-gunicorn --worker-class eventlet -w 1 app:app_instance.app
 ```
 
 O servidor estará disponível em: `http://localhost:5000`
