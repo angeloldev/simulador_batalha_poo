@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+
+{% block title %}Criar Personagem - Medieval Fantasy Battle Simulator{% endblock %}
+
+{% block content %}
+<div class="create-character-container">
+    <div class="create-header">
+        <h2>🧙‍♂️ Criar Novo Herói</h2>
+        <p>Escolha sua classe e forje sua lenda em Eldoria</p>
+    </div>
+
+    <form method="POST" class="character-form">
+        <div class="form-section">
+            <h3>📝 Informações Básicas</h3>
+            <div class="form-group">
+                <label for="nome">Nome do Personagem:</label>
+                <input type="text" id="nome" name="nome" required 
+                       placeholder="Digite o nome do seu herói" maxlength="50">
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>⚔️ Escolha sua Classe</h3>
+            <div class="class-selection">
+                <div class="class-option">
+                    <input type="radio" id="guerreiro" name="classe" value="guerreiro" required>
+                    <label for="guerreiro" class="class-card guerreiro">
+                        <div class="class-icon">🛡️</div>
+                        <div class="class-info">
+                            <h4>Guerreiro</h4>
+                            <p>Mestre do combate físico com força e resistência superiores</p>
+                            <div class="class-stats">
+                                <div class="stat">💪 Força: Alta</div>
+                                <div class="stat">🛡️ Defesa: Alta</div>
+                                <div class="stat">❤️ Vida: 120</div>
+                                <div class="stat">⚡ Recurso: Fúria</div>
+                            </div>
+                            <div class="class-abilities">
+                                <strong>Habilidades:</strong>
+                                <ul>
+                                    <li>Golpe Poderoso</li>
+                                    <li>Provocar</li>
+                                    <li>Postura Defensiva</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="class-option">
+                    <input type="radio" id="mago" name="classe" value="mago">
+                    <label for="mago" class="class-card mago">
+                        <div class="class-icon">🔮</div>
+                        <div class="class-info">
+                            <h4>Mago</h4>
+                            <p>Manipulador de magia arcana com feitiços devastadores</p>
+                            <div class="class-stats">
+                                <div class="stat">🧠 Inteligência: Alta</div>
+                                <div class="stat">💥 Dano Mágico: Alto</div>
+                                <div class="stat">❤️ Vida: 80</div>
+                                <div class="stat">💙 Recurso: Mana</div>
+                            </div>
+                            <div class="class-abilities">
+                                <strong>Habilidades:</strong>
+                                <ul>
+                                    <li>Bola de Fogo</li>
+                                    <li>Raio de Gelo</li>
+                                    <li>Barreira Arcana</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="class-option">
+                    <input type="radio" id="arqueiro" name="classe" value="arqueiro">
+                    <label for="arqueiro" class="class-card arqueiro">
+                        <div class="class-icon">🏹</div>
+                        <div class="class-info">
+                            <h4>Arqueiro</h4>
+                            <p>Especialista em combate à distância com precisão letal</p>
+                            <div class="class-stats">
+                                <div class="stat">🎯 Destreza: Alta</div>
+                                <div class="stat">💥 Crítico: Alto</div>
+                                <div class="stat">❤️ Vida: 95</div>
+                                <div class="stat">💚 Recurso: Stamina</div>
+                            </div>
+                            <div class="class-abilities">
+                                <strong>Habilidades:</strong>
+                                <ul>
+                                    <li>Tiro Certeiro</li>
+                                    <li>Chuva de Flechas</li>
+                                    <li>Evasão</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>📊 Preview do Personagem</h3>
+            <div class="character-preview" id="character-preview">
+                <div class="preview-placeholder">
+                    <div class="preview-icon">👤</div>
+                    <p>Selecione uma classe para ver o preview</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-large">
+                ⚔️ Criar Personagem
+            </button>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary btn-large">
+                ↩️ Voltar ao Dashboard
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const classOptions = document.querySelectorAll('input[name="classe"]');
+        const characterPreview = document.getElementById('character-preview');
+        const nameInput = document.getElementById('nome');
+        
+        // Dados das classes para preview
+        const classData = {
+            guerreiro: {
+                icon: '🛡️',
+                name: 'Guerreiro',
+                description: 'Tanque resistente especializado em combate corpo a corpo',
+                stats: {
+                    'Vida': 120,
+                    'Força': 15,
+                    'Defesa': 13,
+                    'Destreza': 10,
+                    'Inteligência': 8
+                },
+                resource: 'Fúria (100)',
+                color: '#d32f2f'
+            },
+            mago: {
+                icon: '🔮',
+                name: 'Mago',
+                description: 'Conjurador poderoso com magia elemental',
+                stats: {
+                    'Vida': 80,
+                    'Força': 8,
+                    'Defesa': 6,
+                    'Destreza': 10,
+                    'Inteligência': 15
+                },
+                resource: 'Mana (100)',
+                color: '#1976d2'
+            },
+            arqueiro: {
+                icon: '🏹',
+                name: 'Arqueiro',
+                description: 'Atirador preciso com alta chance de crítico',
+                stats: {
+                    'Vida': 95,
+                    'Força': 10,
+                    'Defesa': 8,
+                    'Destreza': 15,
+                    'Inteligência': 10
+                },
+                resource: 'Stamina (100) + Flechas (20)',
+                color: '#388e3c'
+            }
+        };
+        
+        // Atualizar preview quando classe for selecionada
+        classOptions.forEach(option => {
+            option.addEventListener('change', function() {
+                if (this.checked) {
+                    updateCharacterPreview(this.value);
+                    
+                    // Adicionar classe visual ao card selecionado
+                    document.querySelectorAll('.class-card').forEach(card => {
+                        card.classList.remove('selected');
+                    });
+                    this.nextElementSibling.classList.add('selected');
+                }
+            });
+        });
+        
+        // Atualizar preview quando nome mudar
+        nameInput.addEventListener('input', function() {
+            const selectedClass = document.querySelector('input[name="classe"]:checked');
+            if (selectedClass) {
+                updateCharacterPreview(selectedClass.value);
+            }
+        });
+        
+        function updateCharacterPreview(className) {
+            const data = classData[className];
+            const characterName = nameInput.value || 'Seu Herói';
+            
+            characterPreview.innerHTML = `
+                <div class="preview-card ${className}">
+                    <div class="preview-header">
+                        <div class="preview-avatar">
+                            <div class="avatar-icon">${data.icon}</div>
+                        </div>
+                        <div class="preview-info">
+                            <h4>${characterName}</h4>
+                            <div class="preview-class">${data.name}</div>
+                            <div class="preview-level">Nível 1</div>
+                        </div>
+                    </div>
+                    
+                    <div class="preview-description">
+                        <p>${data.description}</p>
+                    </div>
+                    
+                    <div class="preview-stats">
+                        <h5>Atributos Iniciais:</h5>
+                        <div class="stats-grid">
+                            ${Object.entries(data.stats).map(([stat, value]) => `
+                                <div class="stat-item">
+                                    <span class="stat-name">${stat}</span>
+                                    <span class="stat-value">${value}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="preview-resource">
+                        <strong>Recurso:</strong> ${data.resource}
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Validação do formulário
+        const form = document.querySelector('.character-form');
+        form.addEventListener('submit', function(e) {
+            const name = nameInput.value.trim();
+            const selectedClass = document.querySelector('input[name="classe"]:checked');
+            
+            if (!name) {
+                e.preventDefault();
+                alert('Por favor, digite um nome para seu personagem.');
+                nameInput.focus();
+                return;
+            }
+            
+            if (name.length < 2) {
+                e.preventDefault();
+                alert('O nome deve ter pelo menos 2 caracteres.');
+                nameInput.focus();
+                return;
+            }
+            
+            if (!selectedClass) {
+                e.preventDefault();
+                alert('Por favor, selecione uma classe para seu personagem.');
+                return;
+            }
+            
+            // Animação de loading
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = '⏳ Criando personagem...';
+            submitBtn.disabled = true;
+        });
+        
+        // Animações de entrada
+        const cards = document.querySelectorAll('.class-card');
+        cards.forEach((card, index) => {
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 200);
+        });
+    });
+</script>
+{% endblock %}

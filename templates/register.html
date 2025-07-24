@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Registro - Medieval Fantasy Battle Simulator{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h2>🛡️ Junte-se ao Reino</h2>
+            <p>Crie sua conta e comece sua jornada épica</p>
+        </div>
+
+        <form method="POST" class="auth-form">
+            <div class="form-group">
+                <label for="username">Nome de Usuário:</label>
+                <input type="text" id="username" name="username" required 
+                       placeholder="Escolha um nome único" minlength="3">
+                <small>Mínimo 3 caracteres</small>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required 
+                       placeholder="seu@email.com">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Senha:</label>
+                <input type="password" id="password" name="password" required 
+                       placeholder="Crie uma senha segura" minlength="6">
+                <small>Mínimo 6 caracteres</small>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm_password">Confirmar Senha:</label>
+                <input type="password" id="confirm_password" name="confirm_password" required 
+                       placeholder="Digite a senha novamente">
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full">
+                🏰 Criar Conta
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Já tem uma conta? 
+                <a href="{{ url_for('login') }}" class="auth-link">Faça login aqui</a>
+            </p>
+        </div>
+    </div>
+
+    <div class="auth-info">
+        <h3>🎯 Recursos da Conta</h3>
+        <ul>
+            <li>🔐 Senha criptografada com bcrypt</li>
+            <li>💾 Seus personagens salvos na nuvem</li>
+            <li>📊 Histórico completo de batalhas</li>
+            <li>🌐 Acesso de qualquer dispositivo</li>
+            <li>⚡ Batalhas em tempo real</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('.auth-form');
+        const password = document.getElementById('password');
+        const confirmPassword = document.getElementById('confirm_password');
+        
+        // Validação de senha em tempo real
+        function validatePasswords() {
+            if (password.value && confirmPassword.value) {
+                if (password.value === confirmPassword.value) {
+                    confirmPassword.setCustomValidity('');
+                    confirmPassword.parentElement.classList.remove('error');
+                    confirmPassword.parentElement.classList.add('success');
+                } else {
+                    confirmPassword.setCustomValidity('As senhas não coincidem');
+                    confirmPassword.parentElement.classList.remove('success');
+                    confirmPassword.parentElement.classList.add('error');
+                }
+            }
+        }
+        
+        password.addEventListener('input', validatePasswords);
+        confirmPassword.addEventListener('input', validatePasswords);
+        
+        // Indicador de força da senha
+        password.addEventListener('input', function() {
+            const strength = getPasswordStrength(this.value);
+            const parent = this.parentElement;
+            
+            parent.classList.remove('weak', 'medium', 'strong');
+            if (this.value.length > 0) {
+                parent.classList.add(strength);
+            }
+        });
+        
+        function getPasswordStrength(password) {
+            let score = 0;
+            if (password.length >= 8) score++;
+            if (/[a-z]/.test(password)) score++;
+            if (/[A-Z]/.test(password)) score++;
+            if (/[0-9]/.test(password)) score++;
+            if (/[^A-Za-z0-9]/.test(password)) score++;
+            
+            if (score < 3) return 'weak';
+            if (score < 5) return 'medium';
+            return 'strong';
+        }
+        
+        form.addEventListener('submit', function(e) {
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = '⏳ Criando conta...';
+            submitBtn.disabled = true;
+        });
+    });
+</script>
+{% endblock %}

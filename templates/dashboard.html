@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Medieval Fantasy Battle Simulator{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h2>🏰 Seu Reino, {{ user.username }}!</h2>
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <div class="stat-number">{{ total_characters }}</div>
+                <div class="stat-label">Personagens</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="online-players">0</div>
+                <div class="stat-label">Jogadores Online</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="active-battles">0</div>
+                <div class="stat-label">Batalhas Ativas</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-content">
+        <div class="dashboard-section">
+            <h3>⚔️ Ações Rápidas</h3>
+            <div class="quick-actions">
+                <a href="{{ url_for('create_character') }}" class="action-card">
+                    <div class="action-icon">🧙‍♂️</div>
+                    <div class="action-title">Criar Personagem</div>
+                    <div class="action-desc">Crie um novo herói para suas batalhas</div>
+                </a>
+                
+                <a href="{{ url_for('battle_room') }}" class="action-card">
+                    <div class="action-icon">⚡</div>
+                    <div class="action-title">Sala de Batalha</div>
+                    <div class="action-desc">Entre em batalhas em tempo real</div>
+                </a>
+                
+                <a href="#" class="action-card" onclick="loadBattleHistory()">
+                    <div class="action-icon">📊</div>
+                    <div class="action-title">Histórico</div>
+                    <div class="action-desc">Veja suas batalhas anteriores</div>
+                </a>
+            </div>
+        </div>
+
+        <div class="dashboard-section">
+            <h3>👥 Seus Personagens</h3>
+            {% if personagens %}
+                <div class="characters-grid">
+                    {% for personagem in personagens %}
+                        <div class="character-card {{ personagem.classe.lower() }}">
+                            <div class="character-avatar">
+                                <div class="avatar-icon {{ personagem.classe.lower() }}-icon"></div>
+                            </div>
+                            <div class="character-info">
+                                <h4>{{ personagem.nome }}</h4>
+                                <div class="character-class">{{ personagem.classe }}</div>
+                                <div class="character-level">Nível {{ personagem.nivel }}</div>
+                                
+                                <div class="character-stats">
+                                    <div class="stat-bar">
+                                        <div class="stat-label">Vida</div>
+                                        <div class="stat-progress">
+                                            <div class="stat-fill health" 
+                                                 style="width: {{ (personagem.vida_atual / personagem.vida_maxima * 100) }}%"></div>
+                                        </div>
+                                        <div class="stat-text">{{ personagem.vida_atual }}/{{ personagem.vida_maxima }}</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="character-actions">
+                                    <button class="btn btn-small btn-primary" 
+                                            onclick="selectCharacterForBattle('{{ personagem.id }}')">
+                                        Batalhar
+                                    </button>
+                                    <button class="btn btn-small btn-secondary" 
+                                            onclick="viewCharacterDetails('{{ personagem.id }}')">
+                                        Detalhes
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">🏰</div>
+                    <h4>Nenhum personagem criado</h4>
+                    <p>Crie seu primeiro herói para começar a batalhar!</p>
+                    <a href="{{ url_for('create_character') }}" class="btn btn-primary">
+                        Criar Primeiro Personagem
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="dashboard-section">
+            <h3>🌐 Status da Conexão</h3>
+            <div class="connection-status">
+                <div class="status-indicator" id="connection-status">
+                    <div class="status-dot offline"></div>
+                    <span>Conectando...</span>
+                </div>
+                <div class="connection-info">
+                    <small>WebSocket para batalhas em tempo real</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para seleção de personagem -->
+<div class="modal" id="character-select-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Selecionar Personagem para Batalha</h3>
+            <button class="close-modal" onclick="closeModal('character-select-modal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="character-select-list">
+                <!-- Será preenchido via JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    // Inicializar WebSocket
+    const socket = io();
+    let isConnected = false;
+    
+    // Eventos de conexão
+    socket.on('connect', function() {
+        isConnected = true;
+        updateConnectionStatus('online', 'Conectado');
+        console.log('Conectado ao servidor WebSocket');
+    });
+    
+    socket.on('disconnect', function() {
+        isConnected = false;
+        updateConnectionStatus('offline', 'Desconectado');
+        console.log('Desconectado do servidor WebSocket');
+    });
+    
+    socket.on('connected', function(data) {
+        console.log('Autenticado:', data.message);
+        updateConnectionStatus('online', `Conectado como ${data.username}`);
+    });
+    
+    // Atualizar status da conexão
+    function updateConnectionStatus(status, message) {
+        const statusElement = document.getElementById('connection-status');
+        const dot = statusElement.querySelector('.status-dot');
+        const text = statusElement.querySelector('span');
+        
+        dot.className = `status-dot ${status}`;
+        text.textContent = message;
+    }
+    
+    // Selecionar personagem para batalha
+    function selectCharacterForBattle(characterId) {
+        if (!isConnected) {
+            alert('Conecte-se ao servidor primeiro!');
+            return;
+        }
+        
+        // Redirecionar para sala de batalha com personagem selecionado
+        window.location.href = `{{ url_for('battle_room') }}?character=${characterId}`;
+    }
+    
+    // Ver detalhes do personagem
+    function viewCharacterDetails(characterId) {
+        // Implementar modal ou página de detalhes
+        alert(`Detalhes do personagem ${characterId} - Em desenvolvimento`);
+    }
+    
+    // Carregar histórico de batalhas
+    function loadBattleHistory() {
+        alert('Histórico de batalhas - Em desenvolvimento');
+    }
+    
+    // Fechar modal
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+    
+    // Atualizar estatísticas em tempo real
+    function updateDashboardStats() {
+        // Simular dados em tempo real
+        document.getElementById('online-players').textContent = Math.floor(Math.random() * 50) + 10;
+        document.getElementById('active-battles').textContent = Math.floor(Math.random() * 20) + 5;
+    }
+    
+    // Atualizar stats a cada 30 segundos
+    setInterval(updateDashboardStats, 30000);
+    updateDashboardStats();
+    
+    // Animações de entrada
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.character-card, .action-card, .stat-card');
+        cards.forEach((card, index) => {
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    });
+</script>
+{% endblock %}

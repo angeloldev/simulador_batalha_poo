@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Medieval Fantasy Battle Simulator{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h2>🏰 Entrar no Reino</h2>
+            <p>Faça login para acessar suas batalhas épicas</p>
+        </div>
+
+        <form method="POST" class="auth-form">
+            <div class="form-group">
+                <label for="username">Usuário ou Email:</label>
+                <input type="text" id="username" name="username" required 
+                       placeholder="Digite seu usuário ou email">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Senha:</label>
+                <input type="password" id="password" name="password" required 
+                       placeholder="Digite sua senha">
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full">
+                ⚔️ Entrar na Batalha
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Não tem uma conta? 
+                <a href="{{ url_for('register') }}" class="auth-link">Registre-se aqui</a>
+            </p>
+        </div>
+    </div>
+
+    <div class="auth-info">
+        <h3>🎮 Sobre o Jogo</h3>
+        <ul>
+            <li>🗡️ Crie personagens únicos (Guerreiro, Mago, Arqueiro)</li>
+            <li>⚡ Batalhas em tempo real via WebSocket</li>
+            <li>🏆 Sistema de ranking e histórico</li>
+            <li>🔐 Conta segura com criptografia</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    // Adicionar efeitos visuais ao formulário
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('.auth-form');
+        const inputs = form.querySelectorAll('input');
+        
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.classList.add('focused');
+            });
+            
+            input.addEventListener('blur', function() {
+                if (!this.value) {
+                    this.parentElement.classList.remove('focused');
+                }
+            });
+        });
+        
+        form.addEventListener('submit', function(e) {
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = '⏳ Entrando...';
+            submitBtn.disabled = true;
+        });
+    });
+</script>
+{% endblock %}

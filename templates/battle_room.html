@@ -1,0 +1,526 @@
+{% extends "base.html" %}
+
+{% block title %}Sala de Batalha - Medieval Fantasy Battle Simulator{% endblock %}
+
+{% block content %}
+<div class="battle-room-container">
+    <div class="battle-room-header">
+        <h2>⚡ Sala de Batalha em Tempo Real</h2>
+        <div class="connection-status">
+            <div class="status-indicator" id="ws-status">
+                <div class="status-dot offline"></div>
+                <span>Conectando...</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="battle-room-content">
+        <!-- Seleção de Personagem -->
+        <div class="battle-section" id="character-selection">
+            <h3>🧙‍♂️ Escolha seu Personagem</h3>
+            <div class="character-selector">
+                <select id="character-select">
+                    <option value="">Carregando personagens...</option>
+                </select>
+                <button id="join-queue-btn" class="btn btn-primary" disabled>
+                    🔍 Procurar Oponente
+                </button>
+            </div>
+        </div>
+
+        <!-- Fila de Batalha -->
+        <div class="battle-section" id="battle-queue" style="display: none;">
+            <h3>⏳ Procurando Oponente...</h3>
+            <div class="queue-status">
+                <div class="loading-spinner"></div>
+                <p>Aguardando outro jogador entrar na fila...</p>
+                <button id="leave-queue-btn" class="btn btn-secondary">
+                    ❌ Sair da Fila
+                </button>
+            </div>
+        </div>
+
+        <!-- Jogadores Online -->
+        <div class="battle-section">
+            <h3>👥 Jogadores Online</h3>
+            <div class="online-players" id="online-players">
+                <div class="loading-players">
+                    <div class="loading-spinner"></div>
+                    <p>Carregando jogadores online...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Arena de Batalha -->
+        <div class="battle-section" id="battle-arena" style="display: none;">
+            <h3>⚔️ Batalha em Andamento</h3>
+            <div class="battle-field">
+                <div class="combatant player1">
+                    <div class="combatant-info">
+                        <div class="combatant-avatar"></div>
+                        <div class="combatant-details">
+                            <h4 class="combatant-name">Jogador 1</h4>
+                            <div class="combatant-class">Classe</div>
+                            <div class="health-bar">
+                                <div class="health-fill" style="width: 100%"></div>
+                            </div>
+                            <div class="health-text">100/100</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="battle-center">
+                    <div class="vs-indicator">VS</div>
+                    <div class="turn-indicator" id="turn-indicator">
+                        Turno 1
+                    </div>
+                </div>
+
+                <div class="combatant player2">
+                    <div class="combatant-info">
+                        <div class="combatant-avatar"></div>
+                        <div class="combatant-details">
+                            <h4 class="combatant-name">Jogador 2</h4>
+                            <div class="combatant-class">Classe</div>
+                            <div class="health-bar">
+                                <div class="health-fill" style="width: 100%"></div>
+                            </div>
+                            <div class="health-text">100/100</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ações de Batalha -->
+            <div class="battle-actions" id="battle-actions">
+                <h4>Suas Ações:</h4>
+                <div class="action-buttons">
+                    <button class="btn btn-action attack" onclick="performAction('atacar')">
+                        ⚔️ Atacar
+                    </button>
+                    <button class="btn btn-action defend" onclick="performAction('defender')">
+                        🛡️ Defender
+                    </button>
+                    <button class="btn btn-action ability" onclick="showAbilities()">
+                        ✨ Habilidades
+                    </button>
+                </div>
+                
+                <div class="abilities-panel" id="abilities-panel" style="display: none;">
+                    <h5>Escolha uma Habilidade:</h5>
+                    <div id="abilities-list">
+                        <!-- Será preenchido dinamicamente -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Log de Batalha -->
+            <div class="battle-log">
+                <h4>📜 Log da Batalha</h4>
+                <div class="log-entries" id="battle-log-entries">
+                    <!-- Entradas do log serão adicionadas aqui -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Resultado da Batalha -->
+        <div class="battle-section" id="battle-result" style="display: none;">
+            <h3>🏆 Resultado da Batalha</h3>
+            <div class="result-content">
+                <div class="winner-announcement" id="winner-announcement">
+                    <!-- Será preenchido quando a batalha terminar -->
+                </div>
+                <div class="result-actions">
+                    <button class="btn btn-primary" onclick="returnToQueue()">
+                        🔄 Nova Batalha
+                    </button>
+                    <button class="btn btn-secondary" onclick="returnToDashboard()">
+                        🏠 Voltar ao Dashboard
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Desafios -->
+<div class="modal" id="challenge-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>⚔️ Desafio de Batalha</h3>
+        </div>
+        <div class="modal-body">
+            <div id="challenge-content">
+                <!-- Conteúdo do desafio será inserido aqui -->
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-primary" id="accept-challenge">
+                ✅ Aceitar
+            </button>
+            <button class="btn btn-secondary" id="decline-challenge">
+                ❌ Recusar
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    // Variáveis globais
+    const socket = io();
+    let currentCharacter = null;
+    let currentBattle = null;
+    let isInQueue = false;
+    let isInBattle = false;
+    
+    // Elementos DOM
+    const characterSelect = document.getElementById('character-select');
+    const joinQueueBtn = document.getElementById('join-queue-btn');
+    const leaveQueueBtn = document.getElementById('leave-queue-btn');
+    const wsStatus = document.getElementById('ws-status');
+    const onlinePlayers = document.getElementById('online-players');
+    const battleLogEntries = document.getElementById('battle-log-entries');
+    
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', function() {
+        loadUserCharacters();
+        setupEventListeners();
+    });
+    
+    // Carregar personagens do usuário
+    async function loadUserCharacters() {
+        try {
+            const response = await fetch('/api/characters');
+            const characters = await response.json();
+            
+            characterSelect.innerHTML = '<option value="">Selecione um personagem</option>';
+            
+            characters.forEach(char => {
+                const option = document.createElement('option');
+                option.value = char.id;
+                option.textContent = `${char.nome} (${char.classe}) - Nv.${char.nivel}`;
+                characterSelect.appendChild(option);
+            });
+            
+            if (characters.length === 0) {
+                characterSelect.innerHTML = '<option value="">Nenhum personagem encontrado</option>';
+            }
+        } catch (error) {
+            console.error('Erro ao carregar personagens:', error);
+            characterSelect.innerHTML = '<option value="">Erro ao carregar personagens</option>';
+        }
+    }
+    
+    // Configurar event listeners
+    function setupEventListeners() {
+        characterSelect.addEventListener('change', function() {
+            joinQueueBtn.disabled = !this.value;
+            currentCharacter = this.value;
+        });
+        
+        joinQueueBtn.addEventListener('click', joinBattleQueue);
+        leaveQueueBtn.addEventListener('click', leaveBattleQueue);
+    }
+    
+    // Eventos WebSocket
+    socket.on('connect', function() {
+        updateConnectionStatus('online', 'Conectado');
+    });
+    
+    socket.on('disconnect', function() {
+        updateConnectionStatus('offline', 'Desconectado');
+    });
+    
+    socket.on('connected', function(data) {
+        updateConnectionStatus('online', `Conectado como ${data.username}`);
+    });
+    
+    socket.on('joined_queue', function(data) {
+        showBattleQueue();
+        addLogEntry(`Entrou na fila com ${data.character.nome}`);
+    });
+    
+    socket.on('player_joined_queue', function(data) {
+        addLogEntry(`${data.user} entrou na fila com ${data.character.nome}`);
+        updateOnlinePlayers();
+    });
+    
+    socket.on('battle_challenge', function(data) {
+        showChallengeModal(data);
+    });
+    
+    socket.on('battle_started', function(data) {
+        startBattle(data);
+    });
+    
+    socket.on('battle_update', function(data) {
+        updateBattle(data);
+    });
+    
+    socket.on('battle_ended', function(data) {
+        endBattle(data);
+    });
+    
+    socket.on('error', function(data) {
+        alert('Erro: ' + data.message);
+        addLogEntry(`Erro: ${data.message}`, 'error');
+    });
+    
+    // Funções de batalha
+    function joinBattleQueue() {
+        if (!currentCharacter) {
+            alert('Selecione um personagem primeiro!');
+            return;
+        }
+        
+        socket.emit('join_battle_queue', {
+            character_id: currentCharacter
+        });
+        
+        isInQueue = true;
+    }
+    
+    function leaveBattleQueue() {
+        socket.emit('leave_battle_queue');
+        hideBattleQueue();
+        isInQueue = false;
+    }
+    
+    function performAction(action) {
+        if (!isInBattle || !currentBattle) {
+            alert('Você não está em uma batalha!');
+            return;
+        }
+        
+        socket.emit('battle_action', {
+            room_id: currentBattle.room_id,
+            action: action
+        });
+    }
+    
+    function performAbility(abilityId) {
+        if (!isInBattle || !currentBattle) {
+            alert('Você não está em uma batalha!');
+            return;
+        }
+        
+        socket.emit('battle_action', {
+            room_id: currentBattle.room_id,
+            action: 'habilidade',
+            habilidade_id: abilityId
+        });
+        
+        hideAbilities();
+    }
+    
+    // Funções de interface
+    function updateConnectionStatus(status, message) {
+        const dot = wsStatus.querySelector('.status-dot');
+        const text = wsStatus.querySelector('span');
+        
+        dot.className = `status-dot ${status}`;
+        text.textContent = message;
+    }
+    
+    function showBattleQueue() {
+        document.getElementById('character-selection').style.display = 'none';
+        document.getElementById('battle-queue').style.display = 'block';
+    }
+    
+    function hideBattleQueue() {
+        document.getElementById('character-selection').style.display = 'block';
+        document.getElementById('battle-queue').style.display = 'none';
+    }
+    
+    function startBattle(data) {
+        currentBattle = data;
+        isInBattle = true;
+        isInQueue = false;
+        
+        // Esconder outras seções
+        document.getElementById('character-selection').style.display = 'none';
+        document.getElementById('battle-queue').style.display = 'none';
+        
+        // Mostrar arena de batalha
+        document.getElementById('battle-arena').style.display = 'block';
+        
+        // Atualizar interface da batalha
+        updateBattleInterface(data.combate);
+        
+        addLogEntry('Batalha iniciada!', 'system');
+    }
+    
+    function updateBattle(data) {
+        updateBattleInterface(data.combate);
+        
+        // Adicionar resultado da ação ao log
+        if (data.action_result) {
+            const result = data.action_result;
+            let message = '';
+            
+            if (result.tipo === 'ataque') {
+                message = `${result.atacante} atacou ${result.alvo} causando ${result.dano_final} de dano`;
+            } else if (result.tipo === 'defesa') {
+                message = `${result.personagem} assumiu postura defensiva`;
+            } else if (result.tipo === 'habilidade') {
+                message = `${result.usuario} usou ${result.habilidade}`;
+            }
+            
+            addLogEntry(message, result.tipo);
+        }
+    }
+    
+    function endBattle(data) {
+        isInBattle = false;
+        currentBattle = null;
+        
+        // Esconder arena
+        document.getElementById('battle-arena').style.display = 'none';
+        
+        // Mostrar resultado
+        const resultSection = document.getElementById('battle-result');
+        const winnerAnnouncement = document.getElementById('winner-announcement');
+        
+        if (data.winner) {
+            winnerAnnouncement.innerHTML = `
+                <div class="winner-card">
+                    <div class="winner-icon">🏆</div>
+                    <h4>${data.winner} Venceu!</h4>
+                    <p>Batalha finalizada com sucesso</p>
+                </div>
+            `;
+        } else {
+            winnerAnnouncement.innerHTML = `
+                <div class="draw-card">
+                    <div class="draw-icon">🤝</div>
+                    <h4>Empate!</h4>
+                    <p>Batalha terminou em empate</p>
+                </div>
+            `;
+        }
+        
+        resultSection.style.display = 'block';
+        addLogEntry(`Batalha finalizada! Vencedor: ${data.winner || 'Empate'}`, 'system');
+    }
+    
+    function updateBattleInterface(combateData) {
+        // Atualizar informações dos combatentes
+        const player1 = document.querySelector('.combatant.player1');
+        const player2 = document.querySelector('.combatant.player2');
+        
+        // Atualizar player 1
+        updateCombatantDisplay(player1, combateData.personagem1);
+        
+        // Atualizar player 2
+        updateCombatantDisplay(player2, combateData.personagem2);
+        
+        // Atualizar indicador de turno
+        document.getElementById('turn-indicator').textContent = `Turno ${combateData.turno_atual}`;
+        
+        // Destacar jogador ativo
+        player1.classList.toggle('active', combateData.personagem_ativo === combateData.personagem1.id);
+        player2.classList.toggle('active', combateData.personagem_ativo === combateData.personagem2.id);
+    }
+    
+    function updateCombatantDisplay(element, personagemData) {
+        const name = element.querySelector('.combatant-name');
+        const classe = element.querySelector('.combatant-class');
+        const healthFill = element.querySelector('.health-fill');
+        const healthText = element.querySelector('.health-text');
+        
+        name.textContent = personagemData.nome;
+        classe.textContent = personagemData.classe;
+        
+        const healthPercent = (personagemData.vida_atual / personagemData.vida_maxima) * 100;
+        healthFill.style.width = `${healthPercent}%`;
+        healthText.textContent = `${personagemData.vida_atual}/${personagemData.vida_maxima}`;
+        
+        // Adicionar classe de baixa vida
+        element.classList.toggle('low-health', healthPercent < 30);
+    }
+    
+    function showAbilities() {
+        const panel = document.getElementById('abilities-panel');
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        
+        // Carregar habilidades do personagem atual
+        // Esta parte seria implementada com base nos dados do personagem
+    }
+    
+    function hideAbilities() {
+        document.getElementById('abilities-panel').style.display = 'none';
+    }
+    
+    function addLogEntry(message, type = 'normal') {
+        const entry = document.createElement('div');
+        entry.className = `log-entry log-${type}`;
+        entry.innerHTML = `
+            <span class="log-time">${new Date().toLocaleTimeString()}</span>
+            <span class="log-message">${message}</span>
+        `;
+        
+        battleLogEntries.insertBefore(entry, battleLogEntries.firstChild);
+        
+        // Limitar número de entradas
+        while (battleLogEntries.children.length > 50) {
+            battleLogEntries.removeChild(battleLogEntries.lastChild);
+        }
+    }
+    
+    function showChallengeModal(data) {
+        const modal = document.getElementById('challenge-modal');
+        const content = document.getElementById('challenge-content');
+        
+        content.innerHTML = `
+            <div class="challenge-info">
+                <h4>${data.challenger} te desafiou para uma batalha!</h4>
+                <div class="challenger-character">
+                    <strong>Personagem:</strong> ${data.character.nome} (${data.character.classe})
+                </div>
+            </div>
+        `;
+        
+        modal.style.display = 'block';
+        
+        // Configurar botões
+        document.getElementById('accept-challenge').onclick = () => {
+            acceptChallenge(data);
+            modal.style.display = 'none';
+        };
+        
+        document.getElementById('decline-challenge').onclick = () => {
+            modal.style.display = 'none';
+        };
+    }
+    
+    function acceptChallenge(challengeData) {
+        if (!currentCharacter) {
+            alert('Selecione um personagem primeiro!');
+            return;
+        }
+        
+        socket.emit('accept_challenge', {
+            challenger_id: challengeData.challenger_id,
+            challenger_character_id: challengeData.character.id,
+            character_id: currentCharacter
+        });
+    }
+    
+    function updateOnlinePlayers() {
+        // Implementar atualização da lista de jogadores online
+        // Esta função seria expandida para mostrar jogadores reais
+    }
+    
+    function returnToQueue() {
+        document.getElementById('battle-result').style.display = 'none';
+        document.getElementById('character-selection').style.display = 'block';
+    }
+    
+    function returnToDashboard() {
+        window.location.href = '{{ url_for("dashboard") }}';
+    }
+</script>
+{% endblock %}

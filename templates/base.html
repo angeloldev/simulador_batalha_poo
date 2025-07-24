@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Medieval Fantasy Battle Simulator{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <div class="container">
+        {% block header %}
+        <header class="main-header">
+            <h1>⚔️ Medieval Fantasy Battle Simulator</h1>
+            {% if session.get('username') %}
+                <div class="user-info">
+                    <span>Bem-vindo, {{ session.username }}!</span>
+                    <a href="{{ url_for('logout') }}" class="btn btn-secondary">Logout</a>
+                </div>
+            {% endif %}
+        </header>
+        {% endblock %}
+
+        {% block navigation %}
+        {% if session.get('username') %}
+        <nav class="main-nav">
+            <ul>
+                <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('create_character') }}">Criar Personagem</a></li>
+                <li><a href="{{ url_for('battle_room') }}">Sala de Batalha</a></li>
+            </ul>
+        </nav>
+        {% endif %}
+        {% endblock %}
+
+        <main class="main-content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message flash-{{ category }}">
+                                {{ message }}
+                                <button class="close-flash" onclick="this.parentElement.remove()">&times;</button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </main>
+
+        {% block footer %}
+        <footer class="main-footer">
+            <p>&copy; 2025 Medieval Fantasy Battle Simulator | Sistema de Autenticação e WebSocket</p>
+        </footer>
+        {% endblock %}
+    </div>
+
+    {% block scripts %}
+    <script>
+        // Auto-hide flash messages
+        setTimeout(function() {
+            const flashMessages = document.querySelectorAll('.flash-message');
+            flashMessages.forEach(function(message) {
+                message.style.opacity = '0';
+                setTimeout(function() {
+                    message.remove();
+                }, 300);
+            });
+        }, 5000);
+    </script>
+    {% endblock %}
+</body>
+</html>
